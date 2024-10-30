@@ -1,12 +1,24 @@
 package graph.leetcode;
 
+import java.util.Arrays;
+
 /**
  * https://leetcode.com/problems/most-stones-removed-with-same-row-or-column
  */
 public class MatrixStoneRemoval {
-
+    public static void main(String[] args) {
+        MatrixStoneRemoval matrixStoneRemoval = new MatrixStoneRemoval();
+        int[][] stones = new int[][]{
+                {0, 0},
+                {0, 1},
+                {1, 0},
+                {1, 2},
+                {2, 1},
+                {2, 2}
+        };
+        System.out.println(matrixStoneRemoval.removeStones(stones));
+    }
     public int removeStones(int[][] stones) {
-
         int n = stones.length;
         UnionFind uf = new UnionFind(n);
         for (int i = 0; i < stones.length; i++) {
@@ -15,6 +27,7 @@ public class MatrixStoneRemoval {
                 // edge.
                 // find connected component, and remove all but one.
                 // count the number of disjoint components.
+                System.out.println(Arrays.toString(stones[i]) + " " + Arrays.toString(stones[j]));
                 if (stones[i][0] == stones[j][0] || stones[i][1] == stones[j][1]) {
                     uf.union(i, j);
                 }
@@ -27,7 +40,8 @@ public class MatrixStoneRemoval {
          * and the maximum removed stone number (Note: maximum) will be equal to #stone - #islands.
          *
          * Why it is the maximum? Considering an island with connecting stone a-b-c.
-         * If you remove a and c, the maximum count you can remove is 2. However, if you remove 2 first, the remove count will be only 1.
+         * If you remove a and c, the maximum count you can remove is 2.
+         * However, if you remove 2 first, the remove count will be only 1.
          */
         return n - uf.components;
     }

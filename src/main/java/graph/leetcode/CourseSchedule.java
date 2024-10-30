@@ -1,41 +1,41 @@
 package graph.leetcode;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
-/**
- * Input: numCourses = 2, prerequisites = [[1,0]]
- * Output: true
- * Explanation: There are a total of 2 courses to take.
- * To take course 1 you should have finished course 0. So it is possible.
- * <p>
- * Input: numCourses = 2, prerequisites = [[1,0],[0,1]]
- * Output: false
- * Explanation: There are a total of 2 courses to take.
- * To take course 1 you should have finished course 0, and to take course 0 you should
- * also have finished course 1. So it is impossible.
- */
+// https://leetcode.com/problems/course-schedule
 class CourseSchedule {
     public boolean canFinish(int numCourses, int[][] prerequisites) {
+        //inDegree:
+        //Keeps track of how many prerequisites each course has.
+        //Courses with inDegree of 0 are ready to be taken (processed).
+        //topoMap:
+        //Shows which courses become available after completing a particular course.
+        List<List<Integer>> adjList = new ArrayList<>();
+        int[] inDegree = new int[numCourses];
+        Queue<Integer> queue = new ArrayDeque<>();
 
-        Map<Integer, List<Integer>> map = new HashMap<>(); // Courses that depend on the key
-        int[] indegree = new int[numCourses]; //  # of prerequisites for course i
-        Queue<Integer> queue = new ArrayDeque<>(); // Used to find dependants and decrease their outdegree
-
-        for (int[] pre : prerequisites) {
-            map.getOrDefault(pre[1], new ArrayList<>()).add(pre[0]);
-            indegree[pre[0]]++;
+        for (int i = 0; i < numCourses; i++) {
+            adjList.add(new ArrayList<>());
         }
 
-        for (int i = 0; i < indegree.length; i++) {
-            if (indegree[i] == 0) {
+        for (int[] pre : prerequisites) {
+            //the reason we add pre[0] to pre[1] is because
+            // for prerequisites = [[1,0], [2,1], [3,1]]
+            // this provides a map
+            //      0 -> [1]
+            //      1 -> [2, 3]
+            //      2 -> []
+            //      3 -> []
+            // so when we finish 1, we can take 2 and 3
+            // the path to arrive at 1 is from 0 since 0 has no inDegree
+            //we typically want to know which courses we can take next
+            // (i.e., which courses have prerequisites that we've already completed).
+            adjList.get(pre[1]).add(pre[0]);
+            inDegree[pre[0]]++;
+        }
+
+        for (int i = 0; i < inDegree.length; i++) {
+            if (inDegree[i] == 0) {
                 queue.offer(i);
             }
         }
@@ -43,14 +43,11 @@ class CourseSchedule {
         int count = 0;
         while (!queue.isEmpty()) {
             int temp = queue.poll();
-            if (indegree[temp] == 0) {
+            if (inDegree[temp] == 0) {
                 count++; // if cond for duplicates
             }
-            if (!map.containsKey(temp)) {
-                continue;
-            }
-            for (int i : map.get(temp)) {
-                if (--indegree[i] == 0) {
+            for (int i : adjList.get(temp)) {
+                if (--inDegree[i] == 0) {
                     queue.offer(i);
                 }
             }
@@ -109,46 +106,54 @@ class CourseSchedule {
         return rslt;
     }
 
-    public boolean canFinishDFS(int numCourses, int[][] prerequisites) {
-        // this method basically finds a back-edge between nodes
-        // backedge is when doing a node(A)'s dfs, it puts A to a temp state
-        // while traversing A's child, if any of child dosen't have anymore child it's marked as completed
-        // if there are children it put's the current child to temp state and visits it's children
-        // so when doing a dfs for a node if it encounters a temp state node rather than completed node
-        // then that means there's a cycle we cannot complete the course
-        //   (T)   A \
-        //        /   / 
-        //  (T)  B    /
-        //      / \  /
-        //  (Co) C    D (T)  while doing DFS for D's components we encounter A, but A is still in temp state
-        //
+    // this follows the same approach as bipartite graph
+    //This code: Uses three states (0: unvisited, 1: visiting, 2: visited) to track the DFS progress.
+    public boolean canFinishDfs(int numCourses, int[][] prerequisites) {
 
-        ArrayList<Integer>[] adjList = new ArrayList[numCourses];
+        List<List<Integer>> adjList = new ArrayList<>();
 
         for (int i = 0; i < numCourses; i++) {
-            adjList[i] = new ArrayList<>();
+            adjList.add(new ArrayList<>());
         }
-        for (int[] ints : prerequisites) {
-            adjList[ints[0]].add(ints[1]);
+
+        for (int[] pre : prerequisites) {
+            int curCourse = pre[0];
+            int dependent = pre[1];
+
+            adjList.get(dependent).add(curCourse);
         }
+
         int[] color = new int[numCourses];
 
         for (int i = 0; i < numCourses; i++) {
-            if (color[i] != 2 && dfs(adjList, i, color)) return false;
+            if (!dfs(adjList, i, color)) {
+                return false;
+            }
         }
-        return true;
 
+        return true;
     }
 
-    public boolean dfs(ArrayList<Integer>[] al, int curr, int[] color) {
-        if (color[curr] == 1) return true;
-        color[curr] = 1;
-        for (int x : al[curr]) {
-            if (color[x] != 2 && dfs(al, x, color))
-                return true;
+    public boolean dfs(List<List<Integer>> adjList, int node, int[] color) {
+        if (color[node] == 1) {
+            return false;
         }
-        color[curr] = 2;
-        return false;
+
+        // Return true if the node is completed processing
+        if (color[node] == 2) {
+            return true;
+        }
+        color[node] = 1;
+
+        for (int neighbour : adjList.get(node)) {
+            if (color[neighbour] != 2 && !dfs(adjList, neighbour, color)) {
+                return false;
+            }
+        }
+        // It marks the node as fully processed,
+        // indicating that all its neighbors have been explored and no cycles were found starting from this node.
+        color[node] = 2;
+        return true;
     }
 
 
@@ -164,7 +169,7 @@ class CourseSchedule {
             }
         }
         visited[node] = 2;
-        result.add(node); // this will keep track of which to fininsh first and last
+        result.add(node); // this will keep track of which to finish first and last
         return true;
     }
 }

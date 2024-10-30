@@ -32,6 +32,11 @@ public class TriangleSum {
         return cache[triangleIndex][subIndex];
     }
 
+    //We start from the bottom row and work our way up.
+    //This is often preferred because:
+    //The base case (bottom row) is straightforward - just the values themselves.
+    //For each element, we know we'll always have two choices in the row below.
+    // we can also move from top but the code is cumbersome like from line 63
     public static int minimumTotalBottomUp(List<List<Integer>> triangle) {
 
         int[][] dp = new int[triangle.size()][triangle.size()];
@@ -53,6 +58,37 @@ public class TriangleSum {
         }
 
         return dp[0][0];
+    }
+
+    public static int minimumTotalTopDown(List<List<Integer>> triangle) {
+        int n = triangle.size();
+        int[][] dp = new int[n][n];
+
+        // Initialize the top of the triangle
+        dp[0][0] = triangle.get(0).get(0);
+
+        // Fill the dp table
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j <= i; j++) {
+                if (j == 0) {
+                    // Leftmost element
+                    dp[i][j] = dp[i - 1][j] + triangle.get(i).get(j);
+                } else if (j == i) {
+                    // Rightmost element
+                    dp[i][j] = dp[i - 1][j - 1] + triangle.get(i).get(j);
+                } else {
+                    // Middle elements
+                    dp[i][j] = Math.min(dp[i - 1][j - 1], dp[i - 1][j]) + triangle.get(i).get(j);
+                }
+            }
+        }
+
+        // Find the minimum in the last row
+        int minPath = dp[n - 1][0];
+        for (int j = 1; j < n; j++) {
+            minPath = Math.min(minPath, dp[n - 1][j]);
+        }
+        return minPath;
     }
 
     public static void main(String[] args) {

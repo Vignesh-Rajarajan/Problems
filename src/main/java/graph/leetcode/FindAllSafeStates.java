@@ -5,15 +5,15 @@ import java.util.List;
 
 /**
  * https://leetcode.com/problems/find-eventual-safe-states
+ * https://takeuforward.org/data-structure/find-eventual-safe-states-bfs-topological-sort-g-25/
  *
- * similar to Topological sort, asks to remove cycles and return non cyclic paths
+ * This solution works by detecting cycles.
+ * Nodes that aren't part of any cycle are safe, either because they are terminal themselves or
+ * they lead to terminal nodes eventually.
+ *
+ * Without cycles, any node can eventually reach a terminal state, since it will never loop back to itself.
  */
 public class FindAllSafeStates {
-
-    enum State {
-        VISITED,
-        VISITING
-    }
 
     public List<Integer> eventualSafeNodes(int[][] graph) {
         List<Integer> safeNodes = new ArrayList<>(graph.length);
@@ -39,5 +39,10 @@ public class FindAllSafeStates {
 
         states[node] = State.VISITED;
         return true;
+    }
+
+    enum State {
+        VISITED,
+        VISITING
     }
 }

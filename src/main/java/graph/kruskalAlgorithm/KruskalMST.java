@@ -1,53 +1,51 @@
 package graph.kruskalAlgorithm;
 
+import graph.disjoints.DisjointSetByRank;
+
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class KruskalMST {
 
-	public List<Edge<Integer>> getMST(Graph<Integer> graph) {
-		List<Edge<Integer>> allEdges = graph.getAllEdges();
+    public static void main(String[] args) {
+        KruskalMST kruskalMST = new KruskalMST();
+        int[][] graph = new int[][]{
+                {0, 3, 6},
+                {0, 1, 2},
+                {3, 1, 8},
+                {1, 4, 5},
+                {1, 2, 3},
+                {4, 2, 7}
+        };
+        int[][] mst = kruskalMST.kruskalMST(graph, 5);
+        for (int[] edge : mst) {
+            System.out.println(edge[0] + " -> " + edge[1] + " : " + edge[2]);
+        }
+    }
 
-		Collections.sort(allEdges, (edge1, edge2) -> edge1.getWeight() <= edge2.getWeight() ? -1 : 1);
-		DisjointSet disjointSet = new DisjointSet();
+    public int[][] kruskalMST(int[][] graph, int n) {
+        List<int[]> edges = new ArrayList<>();
+        for (int[] e : graph) {
+            edges.add(new int[]{e[0], e[1], e[2]});
+        }
+        edges.sort(Comparator.comparingInt(a -> a[2]));
 
-		for (Vertex<Integer> vertex : graph.getAllVertex()) {
-			disjointSet.makeSet(vertex.getId());
-		}
+        DisjointSetByRank ds = new DisjointSetByRank(n);
+        List<int[]> mst = new ArrayList<>();
+        int sum = 0;
+        for (int[] edge : edges) {
+            int u = edge[0];
+            int v = edge[1];
+            int w = edge[2];
+            if (ds.findParent(u) != ds.findParent(v)) {
+                ds.union(u, v);
+                mst.add(new int[]{u, v, w});
+                sum += w;
+            }
+        }
+        System.out.println("Sum of MST: " + sum);
+        return mst.toArray(new int[0][]);
 
-		List<Edge<Integer>> resultEdge = new ArrayList<Edge<Integer>>();
-		for (Edge<Integer> edge : allEdges) {
-			long root1 = disjointSet.findSet(edge.getVertex1().getId());
-			long root2 = disjointSet.findSet(edge.getVertex2().getId());
-
-			if (root1 != root2) {
-				resultEdge.add(edge);
-				disjointSet.union(edge.getVertex1().getId(), edge.getVertex2().getId());
-			}
-		}
-		return resultEdge;
-	}
-
-	public static void main(String args[]) {
-		Graph<Integer> graph = new Graph<Integer>(false);
-		graph.addEdge(1, 2, 4);
-		graph.addEdge(1, 3, 1);
-		graph.addEdge(2, 5, 1);
-		graph.addEdge(2, 6, 3);
-		graph.addEdge(2, 4, 2);
-		graph.addEdge(6, 5, 2);
-		graph.addEdge(6, 4, 3);
-		graph.addEdge(4, 7, 2);
-		graph.addEdge(3, 4, 5);
-		graph.addEdge(3, 7, 8);
-
-		KruskalMST mst = new KruskalMST();
-		List<Edge<Integer>> result = mst.getMST(graph);
-		int count = 0;
-		for (Edge<Integer> edge : result) {
-			count += edge.getWeight();
-			System.out.println(edge.getVertex1() + " " + edge.getVertex2() + "-> " + count);
-		}
-	}
+    }
 }

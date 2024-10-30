@@ -1,56 +1,49 @@
 package graph.bellmanFord;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 
 public class BellmanFord {
 
-	private static int INFINITY = 10000000;
+    public static void main(String[] args) {
+        BellmanFord bellmanFord = new BellmanFord();
+        int[][] graph = new int[][]{
+                {3, 2, 6},
+                {5, 3, 1},
+                {0, 1, 5},
+                {1, 5, -3},
+                {1, 2, -2},
+                {3, 4, -2},
+                {2, 4, 3}
+        };
+        System.out.println(Arrays.toString(bellmanFord.shortestPath(graph, 6, 0)));
+    }
 
-	public static void main(String[] args) {
-		Graph<Integer> graph = new Graph<Integer>();
-		graph.addEdges(0, 1, 4);
-		graph.addEdges(0, 2, 5);
-		graph.addEdges(0, 3, 8);
-		graph.addEdges(1, 2, -3);
-		graph.addEdges(2, 4, 4);
-		graph.addEdges(3, 4, 2);
-		graph.addEdges(4, 3, 1);
+    private int[] shortestPath(int[][] graph, int edges, int start) {
+        int[] dist = new int[edges];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[start] = 0;
 
-		BellmanFord bf = new BellmanFord();
-		Vertex<Integer> startVertex = graph.vertexMap.values().iterator().next();
-		bf.shortestPath(graph, startVertex);
-	}
-
-	private void shortestPath(Graph<Integer> graph, Vertex<Integer> startVertex) {
-		Map<Vertex<Integer>, Integer> distance = new HashMap<>();
-		Map<Vertex<Integer>, Vertex<Integer>> parent = new HashMap<>();
-
-		for (Vertex<Integer> vertex : graph.vertexMap.values()) {
-			distance.put(vertex, BellmanFord.INFINITY);
-			parent.put(vertex, null);
-		}
-		distance.put(startVertex, 0);
-
-		for (int i = 0; i < graph.vertexMap.size() - 1; i++) {
-			for (Edge<Integer> edge : graph.allEdges) {
-				int j = distance.get(edge.u) + edge.weight;
-				if (j < distance.get(edge.v)) {
-					distance.put(edge.v, j);
-					parent.put(edge.v, edge.u);
-				}
-			}
-		}
-
-		for (Edge<Integer> edge : graph.allEdges) {
-			int j = distance.get(edge.u) + edge.weight;
-			if (j < distance.get(edge.v)) {
-				throw new NegativeException();
-			}
-		}
-		for (Map.Entry<Vertex<Integer>, Integer> map : distance.entrySet()) {
-			System.out.println(map.getKey().key + "-->" + map.getValue());
-		}
-	}
+        for (int i = 0; i < edges - 1; i++) {
+            for (int[] edge : graph) {
+                int u = edge[0];
+                int v = edge[1];
+                int weight = edge[2];
+                if (dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v]) {
+                    dist[v] = dist[u] + weight;
+                }
+            }
+        }
+        // code to find negative cycle
+        for (int[] edge : graph) {
+            int u = edge[0];
+            int v = edge[1];
+            int weight = edge[2];
+            if (dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v]) {
+                System.out.println("Graph contains negative cycle");
+                return new int[0];
+            }
+        }
+        return dist;
+    }
 
 }

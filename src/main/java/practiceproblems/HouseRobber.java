@@ -2,8 +2,17 @@ package practiceproblems;
 
 /**
  * https://leetcode.com/problems/house-robber/
+ * https://leetcode.com/problems/house-robber-ii/
  */
 public class HouseRobber {
+
+    Integer[] cache;
+
+    public static void main(String[] args) {
+        int[] arr = {2, 7, 9, 3, 1};
+        HouseRobber houseRobber = new HouseRobber();
+        System.out.println(houseRobber.rob(arr));
+    }
 
     public int rob(int[] nums) {
         if (nums.length == 0) {
@@ -12,15 +21,15 @@ public class HouseRobber {
         int incl = nums[0]; // max money can get if rob current house
         int excl = 0; // max money can get if not rob current house
         for (int i = 1; i < nums.length; i++) {
-            int temp = incl;
-            incl = Math.max(incl, excl + nums[i]);
-            excl = temp;
+            int temp = Math.max(incl, excl + nums[i]);
+            excl = incl;
+            incl = temp;
+
         }
         return incl;
     }
 
     public int robCircular(int[] nums) {
-
         if (nums.length == 0) return 0;
         if (nums.length == 1) return nums[0];
         return Math.max(helperFn(nums, 0, nums.length - 2), helperFn(nums, 1, nums.length - 1));
@@ -28,18 +37,16 @@ public class HouseRobber {
     }
 
     public int helperFn(int[] nums, int start, int end) {
-        int pre = 0;
-        int cur = 0;
-        for (int i = start; i <= end; i++) {
-            int temp = Math.max(pre + nums[i], cur);
-            pre = cur;
-            cur = temp;
+        int inclusive = nums[start];
+        int exclusive = 0;
+        for (int i = start + 1; i <= end; i++) {
+            int temp = Math.max(exclusive + nums[i], inclusive);
+            exclusive = inclusive;
+            inclusive = temp;
 
         }
-        return cur;
+        return Math.max(inclusive, exclusive);
     }
-
-    Integer[] cache;
 
     public int robBottomUp(int[] nums) {
         cache = new Integer[nums.length];
@@ -68,11 +75,5 @@ public class HouseRobber {
         }
 
         return dp[nums.length - 1];
-    }
-
-    public static void main(String[] args) {
-        int[] arr = {2, 7, 9, 3, 1};
-        HouseRobber houseRobber = new HouseRobber();
-        System.out.println(houseRobber.rob(arr));
     }
 }

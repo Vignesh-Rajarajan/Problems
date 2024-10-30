@@ -7,10 +7,7 @@ import java.util.Set;
 
 /**
  * https://leetcode.com/problems/making-a-large-island
- *
- * You are given an n x n binary matrix grid. You are allowed to change at most one 0 to be 1.
- *
- * Return the size of the largest island in grid after applying this operation.
+ * tricky graph coloring problem
  */
 public class MakeIslandLarger {
 
@@ -88,11 +85,12 @@ public class MakeIslandLarger {
         int colorIndex = 2; //0 and 1 is already used in grid, hence we start colorIndex from 2
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (grid[i][j] == 1) {
-                    int size = paint(grid, i, j, colorIndex);
-                    map.put(colorIndex, size);
-                    colorIndex++;
+                if (grid[i][j] != 1) {
+                    continue;
                 }
+                int size = paint(grid, i, j, colorIndex);
+                map.put(colorIndex, size);
+                colorIndex++;
             }
         }
 
@@ -101,19 +99,23 @@ public class MakeIslandLarger {
         int res = map.getOrDefault(2, 0);
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (grid[i][j] == 0) {
-                    //We use a set to avoid repeatedly adding islands with the same color
-                    Set<Integer> set = new HashSet<>();
-                    //If current island is at the boundary, we add 0 to the set, whose value is 0 in the map
-                    set.add(i > 0 ? grid[i - 1][j] : 0);
-                    set.add(i < n - 1 ? grid[i + 1][j] : 0);
-                    set.add(j > 0 ? grid[i][j - 1] : 0);
-                    set.add(j < n - 1 ? grid[i][j + 1] : 0);
-
-                    int newSize = 1; //We need to count current island as well, hence we init newSize with 1
-                    for (int color : set) newSize += map.get(color);
-                    res = Math.max(res, newSize);
+                if (grid[i][j] != 0) {
+                    continue;
                 }
+                //We use a set to avoid repeatedly adding islands with the same color
+                Set<Integer> set = new HashSet<>();
+                //If current island is at the boundary, we add 0 to the set, whose value is 0 in the map
+                set.add(i > 0 ? grid[i - 1][j] : 0);
+                set.add(i < n - 1 ? grid[i + 1][j] : 0);
+                set.add(j > 0 ? grid[i][j - 1] : 0);
+                set.add(j < n - 1 ? grid[i][j + 1] : 0);
+
+                int newSize = 1; //We need to count current island as well, hence we init newSize with 1
+                for (int neighbouringColors : set) {
+                    newSize += map.get(neighbouringColors);
+                }
+                res = Math.max(res, newSize);
+
             }
         }
         return res;

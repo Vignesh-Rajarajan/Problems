@@ -2,16 +2,15 @@ package dynamicProgramming.lcs;
 
 import java.util.Arrays;
 
+// https://leetcode.com/problems/longest-common-subsequence/
 public class LongestCommonSubsequence {
 
-    // mistake i normally would assume is dp[0][0]=1, but actually it's not
+    Integer[][] cache;
 
     public static void main(String[] args) {
         String str1 = "ABCD";
         String str2 = "AEDB";
-
         System.out.println(longestCommonSubSeqPrint(str1, str2));
-
     }
 
     public static int longestCommonSubsequence(String text1, String text2) {
@@ -32,24 +31,7 @@ public class LongestCommonSubsequence {
         return dp[text1.length()][text2.length()];
     }
 
-    Integer[][] cache;
-
-    public int longestCommonSubsequenceTopDown(String text1, String text2) {
-        cache = new Integer[text1.length() + 1][text2.length() + 1];
-        return recursionHelper(text1, text2, text1.length() - 1, text2.length() - 1);
-    }
-
-    public int recursionHelper(String text1, String text2, int index1, int index2) {
-        if (index1 < 0 || index2 < 0) return 0;
-        if (cache[index1][index2] != null) return cache[index1][index2];
-
-        if (text1.charAt(index1) == text2.charAt(index2)) {
-            return cache[index1][index2] = 1 + recursionHelper(text1, text2, index1 - 1, index2 - 1);
-        } else {
-            return cache[index1][index2] =  Math.max(recursionHelper(text1, text2, index1 - 1, index2),recursionHelper(text1, text2, index1, index2 - 1));
-        }
-    }
-
+    // this prints only one of the longest common subsequences
     private static String longestCommonSubSeqPrint(String str1, String str2) {
         String[][] dp = new String[str1.length() + 1][str2.length() + 1];
         for (String[] strings : dp) {
@@ -67,6 +49,21 @@ public class LongestCommonSubsequence {
         return dp[str1.length()][str2.length()];
     }
 
+    public int longestCommonSubsequenceTopDown(String text1, String text2) {
+        cache = new Integer[text1.length() + 1][text2.length() + 1];
+        return recursionHelper(text1, text2, text1.length() - 1, text2.length() - 1);
+    }
+
+    public int recursionHelper(String text1, String text2, int index1, int index2) {
+        if (index1 < 0 || index2 < 0) return 0;
+        if (cache[index1][index2] != null) return cache[index1][index2];
+
+        if (text1.charAt(index1) == text2.charAt(index2)) {
+            return cache[index1][index2] = 1 + recursionHelper(text1, text2, index1 - 1, index2 - 1);
+        }
+        return cache[index1][index2] = Math.max(recursionHelper(text1, text2, index1 - 1, index2), recursionHelper(text1, text2, index1, index2 - 1));
+
+    }
 }
 
 

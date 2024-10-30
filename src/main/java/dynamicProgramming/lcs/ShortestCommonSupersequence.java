@@ -1,65 +1,100 @@
 package dynamicProgramming.lcs;
 
-import java.util.Arrays;
-
 /**
  * https://leetcode.com/problems/shortest-common-supersequence/
- * <p>
- *The idea is very simple. The result string should contain all characters of s1 and s2 discarding the common ones.
+ * tricky
+ * The idea is very simple. The result string should contain all characters of s1 and s2 discarding the common ones.
  * -> S1+S2-LCS
  * because characters appearing in LCS are coming twice in the result. So count them only once.
- *
- * O(MN) *O(String len) if we store string in DP
- * else O(MN)
- *
- * Input: str1 = "abac", str2 = "cab"
- * Output: "cabac"
- * Explanation:
- * str1 = "abac" is a subsequence of "cabac" because we can delete the first "c".
- * str2 = "cab" is a subsequence of "cabac" because we can delete the last "ac".
- * The answer provided is the shortest such string that satisfies these properties.
+ *  O(MN)
  */
 public class ShortestCommonSupersequence {
+    public String shortestCommonSupersequence(String str1, String str2) {
+        int m = str1.length();
+        int n = str2.length();
+        int[][] dp = new int[m + 1][n + 1];
 
-    public String shortestCommonSuperSequence(String str1, String str2) {
-
-        String lcs = longestCommonSubSeq(str1, str2);
-        int i = 0;
-        int j = 0;
-
-        StringBuilder sb = new StringBuilder();
-        for (char c : lcs.toCharArray()) {
-            while (i < str1.length() && str1.charAt(i) != c) sb.append(str1.charAt(i++));
-            while (j < str2.length() && str2.charAt(j) != c) sb.append(str2.charAt(j++));
-            sb.append(c);
-            i++;
-            j++;
-        }
-        sb.append(str1.substring(i));
-        sb.append(str2.substring(j));
-
-        return sb.toString();
-    }
-
-    public static void main(String[] args) {
-        new ShortestCommonSupersequence().shortestCommonSuperSequence("abac","cab");
-    }
-
-    public String longestCommonSubSeq(String str1, String str2) {
-        String[][] dp = new String[str1.length() + 1][str2.length() + 1];
-        for (String[] s : dp) {
-            Arrays.fill(s, "");
-        }
-        for (int i = 1; i < dp.length; i++) {
-            for (int j = 1; j < dp[0].length; j++) {
+        // Fill the dp array to find the length of the longest common subsequence (LCS)
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
                 if (str1.charAt(i - 1) == str2.charAt(j - 1)) {
-                    dp[i][j] = dp[i - 1][j - 1] + str1.charAt(i - 1);
+                    dp[i][j] = 1 + dp[i - 1][j - 1];
                 } else {
-                    dp[i][j] = dp[i - 1][j].length() > dp[i][j - 1].length() ? dp[i - 1][j] : dp[i][j - 1];
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
                 }
             }
         }
 
-        return dp[str1.length()][str2.length()];
+        //When characters match (str1[i-1] == str2[j-1]):
+        //We add the character once (since it's common to both strings)
+        //Move diagonally up-left (i-- and j--)
+
+        //When characters don't match:
+        //We compare dp[i-1][j] and dp[i][j-1]
+        //If dp[i-1][j] > dp[i][j-1]: take character from str1 (move up)
+        //Otherwise: take character from str2 (move left)
+        //    W O R L D
+        //  0 0 0 0 0 0
+        //H 0 0 0 0 0 0
+        //E 0 0 0 0 0 0
+        //L 0 0 0 0 1 1
+        //L 0 0 0 0 2 2
+        //O 0 0 1 1 2 2
+        //1. i=5, j=5: dp[4][4] > dp[5][4], append 'D', move left
+        //   Result: "D"
+        //
+        //2. i=5, j=4: dp[4][4] > dp[5][3], append 'L', move left
+        //   Result: "LD"
+        //
+        //3. i=5, j=3: append 'R', move left
+        //   Result: "LDR"
+        //
+        //4. i=5, j=2: Found matching 'O', append 'O', move diagonally
+        //   Result: "LDRO"
+        //
+        //5. i=5, j=1: append 'W', move left
+        //   Result: "LDROW"
+        //
+        //6. Append remaining characters from str1 (HELLO)
+        //   Result: "LDROWH"
+
+        //7. Reverse the final string
+        //   Final Result: "WHORLDLO"
+
+        // Construct the shortest common supersequence
+        StringBuilder ans = new StringBuilder();
+        int i = m, j = n;
+
+        while (i > 0 && j > 0) {
+            if (str1.charAt(i - 1) == str2.charAt(j - 1)) {
+                // If characters match, add them to the result and move diagonally
+                ans.append(str1.charAt(i - 1));
+                i--;
+                j--;
+            } else if (dp[i - 1][j] > dp[i][j - 1]) {
+                // If the value in dp[i-1][j] is greater, add str1's character
+                ans.append(str1.charAt(i - 1));
+                i--;
+            } else {
+                // Otherwise, add str2's character
+                ans.append(str2.charAt(j - 1));
+                j--;
+            }
+        }
+
+        // If any characters remain in str1, append them
+        while (i > 0) {
+            ans.append(str1.charAt(i - 1));
+            i--;
+        }
+
+        // If any characters remain in str2, append them
+        while (j > 0) {
+            ans.append(str2.charAt(j - 1));
+            j--;
+        }
+
+        // Since we constructed the result backwards, reverse the string
+        return ans.reverse().toString();
     }
 }

@@ -3,7 +3,15 @@ package dynamicProgramming.fibonacci;
 import java.util.Arrays;
 import java.util.HashMap;
 
+// https://leetcode.com/problems/climbing-stairs/
 public class FibonacciStaircaseWaysToCoverDist {
+
+
+    public static void main(String args[]) {
+        FibonacciStaircaseWaysToCoverDist fs = new FibonacciStaircaseWaysToCoverDist();
+        System.out.println(fs.fibonacciSeries(4));
+        System.out.println(fs.fibonacciSeriesRecursive(3));
+    }
 
     public int fibonacciSeriesRecursive(int n) {
         if (n == 1)
@@ -11,12 +19,6 @@ public class FibonacciStaircaseWaysToCoverDist {
         if (n == 2)
             return 3;
         return fibonacciSeriesRecursive(n - 1) + fibonacciSeriesRecursive(n - 2);
-    }
-
-    public static void main(String args[]) {
-        FibonacciStaircaseWaysToCoverDist fs = new FibonacciStaircaseWaysToCoverDist();
-        System.out.println(fs.fibonacciSeries(4));
-        System.out.println(fs.fibonacciSeriesRecursive(3));
     }
 
     public int fibonacciSeries(int n) {
@@ -35,7 +37,6 @@ public class FibonacciStaircaseWaysToCoverDist {
         }
         return n2;
     }
-
 
     public int climbStairsBottomUp(int n) {
         int[] dp = new int[n + 1];
@@ -66,45 +67,6 @@ public class FibonacciStaircaseWaysToCoverDist {
 
         return cache[start];
     }
-
-
-    public int minCostClimbingStairs(int[] cost) {
-        if (cost.length == 2) return Math.min(cost[0], cost[1]);
-        int[] dp = new int[cost.length + 1];
-        dp[0] = cost[0];
-        dp[1] = cost[1];
-
-        for (int i = 2; i < cost.length; i++) {
-            dp[i] = Math.min(dp[i - 1], dp[i - 2]) + cost[i];
-        }
-
-        return Math.min(dp[cost.length - 1], dp[cost.length - 2]);
-    }
-
-    private HashMap<Integer, Integer> memo = new HashMap<>();
-
-    public int minCostClimbingStairsRecursion(int[] cost) {
-        return minimumCost(cost.length, cost);
-    }
-
-    private int minimumCost(int i, int[] cost) {
-        // Base case, we are allowed to start at either step 0 or step 1
-        if (i <= 1) {
-            return 0;
-        }
-
-        // Check if we have already calculated minimumCost(i)
-        if (memo.containsKey(i)) {
-            return memo.get(i);
-        }
-
-        // If not, cache the result in our hash map and return it
-        int downOne = cost[i - 1] + minimumCost(i - 1, cost);
-        int downTwo = cost[i - 2] + minimumCost(i - 2, cost);
-        memo.put(i, Math.min(downOne, downTwo));
-        return memo.get(i);
-    }
-
 }
 
 
