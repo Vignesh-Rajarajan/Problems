@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
 
+
 public class DailyTemperature {
     public static int[] dailyTemperatures(int[] temperatures) {
         if (temperatures.length == 1) return new int[]{0};

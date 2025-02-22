@@ -27,8 +27,9 @@ public class CombinationSum {
         for (int i = start; i < candidates.length; i++) {
             if (target - candidates[i] < 0) break;
             tempList.add(candidates[i]);
+
             // The same repeated number may be chosen from candidates unlimited number of times.
-            // that's the reason of using i not i+1
+            // ** that's the reason of using i not i+1 **
             combinationSumUtil(candidates, target - candidates[i], result, tempList, i);
 
             tempList.remove(tempList.size() - 1);
@@ -121,5 +122,26 @@ public class CombinationSum {
         int skip = recursionHelper(nums, target, pos + 1, cache);
 
         return cache[target] = take + skip;
+    }
+
+    public List<List<Integer>> combinationSum3(int k, int n) {
+        List<List<Integer>> result= new ArrayList<>();
+        combinationSumHelper(k,n,new ArrayList<>(), result, 0,1);
+        return result;
+    }
+
+    public void combinationSumHelper(int k, int n, List<Integer> tempList,  List<List<Integer>> result, int sum, int start){
+        if(sum==n && tempList.size()==k){
+            result.add(new ArrayList<>(tempList));
+            return;
+        }
+
+        for(int i=start;i<=9;i++){
+            sum+=i;
+            tempList.add(i);
+            combinationSumHelper(k,n,tempList,result,sum,i+1);
+            sum-=i;
+            tempList.remove(tempList.size()-1);
+        }
     }
 }

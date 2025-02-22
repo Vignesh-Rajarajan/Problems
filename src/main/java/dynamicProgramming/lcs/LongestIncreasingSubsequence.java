@@ -2,22 +2,7 @@ package dynamicProgramming.lcs;
 
 import java.util.Arrays;
 
-/**
- * Solve the LIS subproblem for each snippet of the array ending between 1, 2,
- * 3, ... and so on until nums.length - 1 (inclusive)
- * <p>
- * Ex:
- * <p>
- * [-2, 1, 2, 3]
- * <p>
- * [-2] from index 0 to index 0 [-2, 1] from index 0 to index 1 [-2, 1, 2] from
- * index 0 to index 2 [-2, 1, 2, 3] from index 0 to index 3
- * <p>
- * Our answer is the maximum LNDS found between all subproblems we solve along
- * the way.
- * <p>
- * Time complexity is O(n^2).
- */
+// https://leetcode.com/problems/longest-increasing-subsequence/
 public class LongestIncreasingSubsequence {
 
     public static void main(String[] args) {
@@ -42,12 +27,6 @@ public class LongestIncreasingSubsequence {
     }
 
     public int lengthOfLISBottomUp(int[] nums) {
-        //there were two chaning variable in recursive solution curr and prev
-        //so we need a 2d matrix
-        //length decision:-prev will go max upto nums.length so will take nums.length+1
-        // curr will go max upto nums.length-1 so will take nums.length
-        //for initialization of dp matrix initialize it with -1
-
         int[][] dp = new int[nums.length + 1][nums.length];
         for (int[] x : dp) {
             Arrays.fill(x, -1);

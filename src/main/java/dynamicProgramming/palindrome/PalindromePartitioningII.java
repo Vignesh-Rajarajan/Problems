@@ -6,6 +6,7 @@ package dynamicProgramming.palindrome;
  */
 public class PalindromePartitioningII {
 
+
     public static int minCutPalindromicSubstringVariant(String s) {
         int[] cutsDp = new int[s.length()];
         for (int i = 1; i < s.length(); i++) {
@@ -32,70 +33,48 @@ public class PalindromePartitioningII {
     }
 
     public int minCut(String s) {
-        int n, min;
-        n = s.length();
+        int[] dp = new int[s.length() + 1];
+        for (int i = s.length() - 1; i >= 0; i--) {
+            int minCost = Integer.MAX_VALUE;
 
-        //cut[i] represents minimum number of cuts from String 0 to i
-        int[] cut = new int[n];
-
-        //p[i][j] represents String i to j is a palindrome or not
-        boolean[][] p = new boolean[n][n];
-
-        for (int i = 0; i < n; i++) {
-            min = i;  // Max number of cuts is i for string length i+1
-            for (int j = 0; j <= i; j++) {
-                // Why i - j < 3  ?
-                // 1. String of length 1 is always palindrome so no need to check in boolean table
-                // 2. String of length 2 is palindrome if Ci == Cj which is already checked in first part so no need to check again
-                // 3. String of length 3 is palindrome if Ci == Cj which is already checked in first part and Ci+1 and Cj-1 is same character which is always a palindrome
-
-                // If String length >=4
-                // then check if Ci == Cj and if they are equal check if String[j+1 .. i-1] is a palindrome from the boolean table
-                /**
-                 * a   b   a   |   c  c
-                 *                 j  i
-                 *        j-1  |  [j, i] is palindrome
-                 *    cut(j-1) +  1
-                 */
-                if (s.charAt(j) == s.charAt(i) && (i - j < 3 || p[j + 1][i - 1])) {
-                    // Its a palindrome as Ci == Cj and String[j+1...i-1] is a palindrome
-                    p[j][i] = true;
-                    // j == 0 because String from j to i is a palindrome and it starts from first character so means no cuts needed
-                    // Else I need a cut at jth location and it will be cuts encountered till j-1 + 1
-                    min = j == 0 ? 0 : Math.min(min, cut[j - 1] + 1);
+            for (int j = i; j < s.length(); j++) {
+                if (isPalindrome(s, i, j)) {
+                    int cost = 1 + dp[j + 1];
+                    minCost = Math.min(minCost, cost);
                 }
             }
-            cut[i] = min;
+
+            dp[i] = minCost;
         }
-        return cut[n - 1];
+
+        return dp[0] - 1;
     }
-
-
-    Integer[][] cache;
 
     public int minCutRecursive(String s) {
-        cache = new Integer[s.length() + 1][s.length() + 1];
-
-        return recursionHelper(s, 0, s.length() - 1);
+        Integer[] cache = new Integer[s.length() + 1];
+        return recursionHelper(s, 0, cache) - 1;
     }
 
-    public int recursionHelper(String s, int start, int end) {
-        if (start == end || isPalin(s, start, end)) {
+    int recursionHelper(String s, int idx, Integer[] cache) {
+        if (idx >= s.length()) {
             return 0;
         }
-        if (cache[start][end] != null) return cache[start][end];
+        if (cache[idx] != null) {
+            return cache[idx];
+        }
+        int result = Integer.MAX_VALUE;
+        for (int i = idx; i < s.length(); i++) {
 
-        int minCuts = end - start;
-        for (int i = start; i <= end; i++) {
-            if (isPalin(s, start, i)) {
-                minCuts = Math.min(minCuts, 1 + recursionHelper(s, i + 1, end));
+            if (isPalindrome(s, idx, i)) {
+                int cost = 1 + recursionHelper(s, i + 1, cache);
+                result = Math.min(result, cost);
             }
         }
 
-        return cache[start][end] = minCuts;
+        return cache[idx] = result;
     }
 
-    public boolean isPalin(String s, int start, int end) {
+    public boolean isPalindrome(String s, int start, int end) {
         if (start > end) return false;
 
         while (start < end) {

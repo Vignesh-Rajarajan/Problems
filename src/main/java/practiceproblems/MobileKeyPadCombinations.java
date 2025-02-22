@@ -5,16 +5,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * https://www.geeksforgeeks.org/find-possible-words-phone-digits/
+ * https://leetcode.com/problems/letter-combinations-of-a-phone-number/
  */
 public class MobileKeyPadCombinations {
 
     public List<String> letterCombinations(String digits) {
         List<String> result = new ArrayList<>();
-        if (digits == null || digits.length() == 0) {
+        if (digits == null || digits.isEmpty()) {
             return result;
         }
 
+        // 0 and 1 are not mapped to any characters, so we can ignore them
         String[] keypad = { "--", "00", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz" };
 
         generateCombinations(digits, keypad, digits.length(), 0, new StringBuilder(), result);

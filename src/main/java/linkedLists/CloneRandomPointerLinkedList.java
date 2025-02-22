@@ -3,123 +3,77 @@ package linkedLists;
 import java.util.HashMap;
 import java.util.Map;
 
-// Java program to clone a linked list with next
-// and arbit pointers in O(n) time 
+/**
+ * https://leetcode.com/problems/copy-list-with-random-pointer/
+ */
 class CloneRandomPointerLinkedList {
 
-	// Structure of linked list Node
-	static class Node {
-		int data;
-		Node next, random;
+    public Node copyRandomList(Node head) {
+        if (head == null) {
+            return null;
+        }
+        Node dummy = new Node(-1);
+        dummy.next = head;
 
-		Node(int x) {
-			data = x;
-			next = random = null;
-		}
-	}
+        while (head != null) {
+            Node newNode = new Node(head.data);
+            newNode.next = head.next;
+            head.next = newNode;
+            head = newNode.next;
+        }
 
-	// Utility function to print the list.
-	static void print(Node start) {
-		Node ptr = start;
-		while (ptr != null) {
-			System.out.println("Data = " + ptr.data + ", Random = " + ptr.random.data);
-			ptr = ptr.next;
-		}
-	}
+        head = dummy.next;
 
-	// This function clones a given
-	// linked list in O(1) space
-	static Node clone(Node start) {
-		if(start==null) return null;
-		Node curr = start, temp = null;
+        while (head != null && head.next != null) {
+            head.next.random = head.random != null ? head.random.next : null;
+            head = head.next.next;
+        }
 
-		// insert additional node after
-		// every node of original list
-		while (curr != null) {
-			temp = curr.next;
+        Node oldHead = dummy.next;
+        Node newHead = dummy.next.next;
+        Node newTemp = newHead;
 
-			// Inserting node
-			curr.next = new Node(curr.data);
-			curr.next.next = temp;
-			curr = temp;
-		}
-		curr = start;
+        while (oldHead != null) {
+            oldHead.next = oldHead.next.next;
+            newHead.next = newHead.next == null ? null : newHead.next.next;
 
-		// adjust the random pointers of the
-		// newly added nodes
-		while (curr != null && curr.next!=null) {
-			if (curr.random != null)
-				curr.next.random =  curr.random.next;
-			// move to the next newly added node by
-			// skipping an original node
-			curr =curr.next.next;
-		}
+            oldHead = oldHead.next;
+            newHead = newHead.next;
+        }
 
-		Node original = start, copy = start.next;
+        return newTemp;
+    }
 
-		// save the start of copied linked list
-		temp = copy;
+    public Node copyRandomListExtraSpace(Node head) {
+        if (head == null) {
+            return null;
+        }
 
-		// now separate the original list and copied list
-		while (original != null && copy != null) {
-			original.next = (original.next != null) ? original.next.next : original.next;
+        final Map<Node, Node> map = new HashMap<>();
 
-			copy.next = (copy.next != null) ? copy.next.next : copy.next;
-			original = original.next;
-			copy = copy.next;
-		}
-		return temp;
-	}
+        Node cur = head;
+        while (cur != null) {
+            map.put(cur, new Node(cur.data));
+            cur = cur.next;
+        }
 
-	public RandomListNode copyRandomList(RandomListNode head) {
-		if (head == null) {
-			return null;
-		}
+        for (Map.Entry<Node, Node> entry : map.entrySet()) {
+            final Node newNode = entry.getValue();
+            newNode.next = map.get(entry.getKey().next);
+            newNode.random = map.get(entry.getKey().random);
+        }
 
-		final Map<RandomListNode, RandomListNode> map = new HashMap<>();
+        return map.get(head);
+    }
 
-		RandomListNode cur = head;
-		while(cur != null) {
-			map.put(cur, new RandomListNode(cur.data));
-			cur = cur.next;
-		}
+    // Structure of linked list Node
+    static class Node {
+        int data;
+        Node next, random;
 
-		for (Map.Entry<RandomListNode, RandomListNode> entry : map.entrySet()) {
-			final RandomListNode newNode = entry.getValue();
-			newNode.next = map.get(entry.getKey().next);
-			newNode.random = map.get(entry.getKey().random);
-		}
-
-		return map.get(head);
-	}
-
-	// Driver code
-	public static void main(String[] args) {
-		Node start = new Node(1);
-		start.next = new Node(2);
-		start.next.next = new Node(3);
-		start.next.next.next = new Node(4);
-		start.next.next.next.next = new Node(5);
-
-		// 1's random points to 3
-		start.random = start.next.next;
-
-		// 2's random points to 1
-		start.next.random = start;
-
-		// 3's and 4's random points to 5
-		start.next.next.random = start.next.next.next.next;
-		start.next.next.next.random = start.next.next.next.next;
-
-		// 5's random points to 2
-		start.next.next.next.next.random = start.next;
-
-		System.out.println("Original list : ");
-		print(start);
-
-		System.out.println("Cloned list : ");
-		Node cloned_list = clone(start);
-		print(cloned_list);
-
-	}
+        Node(int x) {
+            data = x;
+            next = random = null;
+        }
+    }
 }

@@ -2,7 +2,7 @@ package linkedLists;
 
 /**
  * https://leetcode.com/problems/reverse-nodes-in-k-group/
- *
+ * <p>
  * tricky
  */
 public class ReverseKBlockNode {
@@ -61,57 +61,47 @@ public class ReverseKBlockNode {
         return prev;
     }
 
-    /**
-     * Reverse a link list between begin and end exclusively
-     * an example:
-     * a linked list:
-     * 0->1->2->3->4->5->6
-     * |           |
-     * begin       end
-     * after call begin = reverse(begin, end)
-     *
-     * 0->3->2->1->4->5->6
-     *          |  |
-     *      begin end
-     * @return the reversed list's 'begin' node, which is the precedence of node end
-     */
-
     public ListNode reverseKGroup(ListNode head, int k) {
-        ListNode begin;
-        if (head == null || head.next == null || k == 1)
-            return head;
-
-        ListNode dummyHead = new ListNode(-1);
-        dummyHead.next = head;
-        begin = dummyHead;
-        int i = 0;
-
-        while (head != null) {
-            i++;
-            ListNode next = head.next;
-            if (i % k == 0) {
-                begin = reverse(begin, next);
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode pointer = dummy;
+        while (pointer != null) {
+            ListNode node = pointer;
+            // first check whether there are k nodes to reverse
+            for (int i = 0; i < k && node != null; i++) {
+                node = node.next;
             }
-                head = next;
+            if (node == null) break;
 
+            // now we know that we have k nodes, we will start from the first node
+            ListNode prev = null, curr = pointer.next, next = null;
+            //step1: 0 (pointer) -> 1      2 -> 3 -> 4 -> 5 -> 6 -> 7
+            //step2: 0 (pointer) -> 1 <- 2      3 -> 4 -> 5 -> 6 -> 7
+            //step3: 0 (pointer) -> 1 <- 2 <- 3      4 -> 5 -> 6 -> 7
+            // link from 3 to 4 will be cut (as shown in step3).
+            for (int i = 0; i < k; i++) {
+                next = curr.next;
+                curr.next = prev;
+                prev = curr;
+                curr = next;
+            }
+            // You will figure out that at step3, the 3 is the prev node, 4 is the curr node.
+            //	step3: 0 (pointer) -> 1 <- 2 <- 3 (prev)    4 (curr) -> 5 -> 6 -> 7
+            //	after first line:   0 (pointer) -> 1 (tail) <- 2 <- 3 (prev)    4 (curr) -> 5 -> 6 -> 7
+            //	after second line:  0 (pointer) -> 1 (tail) <- 2 <- 3 (prev)    4 (curr) -> 5 -> 6 -> 7
+            //								       |____________________________↑
+            //	after third line:
+            //								|-----------------------↓
+            //						0 (pointer)    1 (tail) <- 2 <- 3 (prev)    4 (curr) -> 5 -> 6 -> 7
+            //									   |____________________________↑
+            //
+            //	after forth line:	0 -> 3 -> 2 -> 1 (pointer) -> 4 -> 5 -> 6 -> 7
+            ListNode tail = pointer.next;
+            tail.next = curr;
+            pointer.next = prev;
+            pointer = tail;
         }
-        return dummyHead.next;
-
-    }
-
-    public ListNode reverse(ListNode begin, ListNode end) {
-        ListNode curr = begin.next;
-        ListNode prev = begin;
-        ListNode first = curr;
-        while (curr != end) {
-           ListNode next = curr.next;
-            curr.next = prev;
-            prev = curr;
-            curr = next;
-        }
-        begin.next = prev;
-        first.next = curr;
-        return first;
+        return dummy.next;
     }
 
 }

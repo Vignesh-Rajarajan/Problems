@@ -137,10 +137,6 @@ public class Top20LinkedListQuestions {
 		return head;
 	}
 
-	private void flattenLinkedList() {
-		FlattenLinkedList.flattenList();
-	}
-
 	private Node printMiddleElement() {
 
 		if (head == null) {

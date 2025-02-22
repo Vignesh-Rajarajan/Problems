@@ -14,8 +14,13 @@ import java.util.List;
  */
 class PalindromePartitioning {
 
+    public static void main(String[] args) {
+        PalindromePartitioning partitioning = new PalindromePartitioning();
+        partitioning.partition("aab");
+    }
+
     public List<List<String>> partition(String s) {
-        if (s == null || s.length() == 0) {
+        if (s == null || s.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -52,11 +57,6 @@ class PalindromePartitioning {
             end--;
         }
         return true;
-    }
-
-    public static void main(String[] args) {
-        PalindromePartitioning partitioning = new PalindromePartitioning();
-        partitioning.partition("aab");
     }
 }
 

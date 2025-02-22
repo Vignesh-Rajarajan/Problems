@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/
+ * https://leetcode.com/problems/best-time-to-buy-and-sell-stock-i
  */
 public class BuyAndSellStockAnytime {
 

@@ -26,8 +26,10 @@ public class MaximumRectangle {
         int result = 0;
         for (char[] arr : matrix) {
             int i = 0;
-            // for each cell with value=1, we look upward (north), the number of continuous '1' is the height of cell
-            //First initiate the height array as 1 1 0 1 0 1, which is just a copy of the first row. Then we can easily calculate the max area is 2.
+            // for each cell with value=1, we look upward (north),
+            // the number of continuous '1' is the height of cell
+            //First initiate the height array as 1 1 0 1 0 1, which is just a copy of the first row.
+            // Then we can easily calculate the max area is 2.
             //Then update the array. We scan the second row, when the matrix[1][i] is 0, set the height[i] to 0
             //else height[i] += 1, which means the height has increased by 1. So the height array again becomes 0 2 0 0 1 2.
             // The max area now is also 2.

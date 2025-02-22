@@ -1,13 +1,8 @@
 package dynamicProgramming.stocks;
 
-/**
- * https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/
- */
-class BuyAndSellStockAtMostTwice {
+// https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/
 
-    public static void main(String args[]) {
-        System.out.println("Maximum Profit = " + maxProfit(new int[]{2, 30, 15, 10, 8, 25, 80}));
-    }
+class BuyAndSellStockAtMostTwice {
 
     /**
      * the idea is when we find a profit which is from
@@ -69,6 +64,30 @@ class BuyAndSellStockAtMostTwice {
             int notSell = recursionHelper(prices, idx + 1, 1, txn, dp);
             return dp[idx][canSell][txn] = Math.max(sell, notSell);
         }
+    }
+
+    public int maxProfitDP(int[] prices) {
+        int n = prices.length;
+        int[][][] dp = new int[n][3][2];
+
+        for (int i = 0; i < n; i++) {
+            for (int k = 0; k <= 2; k++) {
+                if (i == 0 || k == 0) {
+                    dp[i][k][0] = 0;
+                    dp[i][k][1] = -prices[i];
+                    continue;
+                }
+
+                dp[i][k][0] = Math.max(dp[i - 1][k][0], dp[i - 1][k][1] + prices[i]);
+                //The intuition behind using dp[i - 1][k-1][0] is that you need to have made k-1 transactions
+                // before the current day in order to be able to make the k-th transaction (buy a stock) on the current day.
+                // This ensures that you are adhering to the constraint of at most 2 transactions.
+                dp[i][k][1] = Math.max(dp[i - 1][k - 1][0] - prices[i], dp[i - 1][k][1]);
+            }
+        }
+
+        // Return the maximum profit with 2 transactions
+        return dp[n - 1][2][0];
     }
 
 }

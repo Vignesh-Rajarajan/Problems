@@ -1,37 +1,48 @@
-package dynamicProgramming.unboundedknapsack;
+package dynamicProgramming.partition;
 
 import java.util.Arrays;
 
 /**
  * https://leetcode.com/problems/minimum-cost-to-cut-a-stick
  * https://www.youtube.com/watch?v=xwomavsC86c
+ * <p>
+ * the difference with other rod cutting problem is
+ * Must make all specified cuts, Each cut position is used exactly once
  */
-public class CuttingRod {
+public class RodCuttingMinimise {
+
+    public static void main(String args[]) {
+        RodCuttingMinimise cr = new RodCuttingMinimise();
+        int[] price = {1, 5, 3, 6};
+        System.out.println(cr.minCost(9, price));
+    }
 
     public int minCost(int n, int[] cuts) {
         int len = cuts.length + 2;
+        int[] cutsWithLen = new int[len];
 
-        int[] endpoints = new int[len];
-        endpoints[0] = 0;
-        for (int i = 1; i < len - 1; i++) endpoints[i] = cuts[i - 1];
-        endpoints[len - 1] = n;
-        Arrays.sort(endpoints);
-
-
+        for (int i = 1; i < len - 1; i++)
+            cutsWithLen[i] = cuts[i - 1];
+        cutsWithLen[len - 1] = n;
+        Arrays.sort(cutsWithLen);
         int[][] dp = new int[len][len];
 
-        // d : dist between i & j, the starting & ending position of stick
-        for (int d = 2; d < len; d++) {
-            for (int i = 0, j = i + d; j < len; i++, j++) {
-                dp[i][j] = Integer.MAX_VALUE;
+        for (int i = len - 2; i > 0; i--) {
+            for (int j = i; j <= len - 2; j++) {
 
-                int curr = endpoints[j] - endpoints[i];
-                for (int k = i + 1; k < j; k++) {
-                    dp[i][j] = Math.min(dp[i][j], dp[i][k] + dp[k][j] + curr);
+                int min = Integer.MAX_VALUE;
+                int cutLen = cutsWithLen[j + 1] - cutsWithLen[i - 1];
+                for (int k = i; k <= j; k++) {
+                    int cost = cutLen + dp[i][k - 1] + dp[k + 1][j];
+                    min = Math.min(min, cost);
                 }
+
+
+                dp[i][j] = min;
             }
         }
-        return dp[0][len - 1];
+
+        return dp[1][len - 2];
     }
 
     /**
@@ -50,10 +61,10 @@ public class CuttingRod {
      */
     public int minCostRecursive(int n, int[] cuts) {
         Integer[][] dp = new Integer[101][101];
-        int[] cutsWithLengthOfRodAppendedToEnds = Arrays.copyOf(cuts, cuts.length + 2);
-        cutsWithLengthOfRodAppendedToEnds[cutsWithLengthOfRodAppendedToEnds.length - 1] = n;
-        Arrays.sort(cutsWithLengthOfRodAppendedToEnds);
-        return recursionHelper(cutsWithLengthOfRodAppendedToEnds, 1, cutsWithLengthOfRodAppendedToEnds.length - 2, dp);
+        int[] cutsWithLen = Arrays.copyOf(cuts, cuts.length + 2);
+        cutsWithLen[cutsWithLen.length - 1] = n;
+        Arrays.sort(cutsWithLen);
+        return recursionHelper(cutsWithLen, 1, cutsWithLen.length - 2, dp);
     }
 
     public int recursionHelper(int[] cutsWithLengthOfRod, int i, int j, Integer[][] dp) {
@@ -63,18 +74,13 @@ public class CuttingRod {
 
         for (int mid = i; mid <= j; mid++) {
 
-            int cost = cutsWithLengthOfRod[j + 1] - cutsWithLengthOfRod[i - 1] + recursionHelper(cutsWithLengthOfRod, i, mid - 1, dp) +
+            int cost = cutsWithLengthOfRod[j + 1] - cutsWithLengthOfRod[i - 1] +
+                    recursionHelper(cutsWithLengthOfRod, i, mid - 1, dp) +
                     recursionHelper(cutsWithLengthOfRod, mid + 1, j, dp);
             min = Math.min(cost, min);
         }
 
         return dp[i][j] = min;
 
-    }
-
-    public static void main(String args[]) {
-        CuttingRod cr = new CuttingRod();
-        int[] price = {1, 5, 3, 6};
-        System.out.println(cr.minCost(9, price));
     }
 }

@@ -3,9 +3,8 @@ package combinationsandpermutations;
 import java.util.Arrays;
 
 /**
- * Tricky TODO revise
  * https://leetcode.com/problems/partition-to-k-equal-sum-subsets/
- *
+ * <p>
  * Ref: http://www.geeksforgeeks.org/partition-set-k-subsets-equal-sum/
  */
 public class CanPartitionKSubSets {

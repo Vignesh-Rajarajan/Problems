@@ -66,7 +66,6 @@ public class MaxHistogram {
         Deque<Integer> stack = new ArrayDeque<>();
         int i = 0;
         while (i < heights.length) {
-
             if (stack.isEmpty() || heights[stack.peekLast()] <= heights[i]) {
                 stack.addLast(i++);
             } else {
@@ -77,7 +76,6 @@ public class MaxHistogram {
                     area = heights[top] * (i - stack.peekLast() - 1);
 
                 }
-
                 result = Math.max(result, area);
             }
 

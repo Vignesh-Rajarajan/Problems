@@ -4,61 +4,49 @@ public class StockBuySellWithCoolDown {
 
     public int maxProfit(int[] prices) {
 
-        if (prices == null || prices.length < 2) return 0;
-        int buy = 0, sell = -prices[0], rest = 0;
-
-        // Assume the buy, sell and rest are states
-        // the transistions would be
-        // 1) from Rest you have to come to buy
-        // 2) from buy you can rest/hold or you can sell
-        // 3) from sell you can hold or sell and go to Rest
-
-        // state 1=> first transistion max(buy, rest) we can either buy or rest at this point
-        // state 2=> we can either hold what was there in previous state or buy so '-' price[i]
-        // state 3=> to come to rest we have to sell and make profit so only the '+' sign
-
-        for (int i = 1; i < prices.length; i++) {
-            int tmp = buy;
-            buy = Math.max(buy, rest);
-            rest = sell + prices[i];
-            sell = Math.max(sell, tmp - prices[i]);
-        }
-        return Math.max(buy, rest);
-    }
-
-    /**
-     * cooldown[i] = max(cooldown[i - 1], sell[i - 1]); // Stay at cooldown, or rest from sell
-     * proceed to buy, ie, we have no stock now, and the max profit should be ''last no stock profit'' or ''last rest profit''
-     * <p>
-     * buy[i] = max(buy[i - 1], cooldown[i - 1] - prices[i]); // Stay at buy, or buy from cooldown
-     * //can proceed to sell, ie, we now have stock, and the profit should be ''last stock profit'' or ''last no stock but buy this time''
-     * <p>
-     * sell[i] = buy[i - 1] + prices[i]; // Only one way from s1
-     * //we should sell then take a rest
-     */
-    public int maxProfitExtraSpace(int[] prices) {
+        if (prices == null || prices.length == 0)
+            return 0;
 
         int n = prices.length;
-        int[] buy = new int[prices.length + 1];
-        int[] sell = new int[prices.length + 1];
+        int[] buy = new int[n];
+        int[] sold = new int[n];
+        int[] rest = new int[n];
 
-        buy[1] = -prices[0];
-        sell[1] = 0;
-        if (n == 1) {
-            return sell[0];
+        // Initial conditions
+        buy[0] = -prices[0]; // Buying the stock on the first day
+        sold[0] = 0; // No profit as we haven't sold anything yet
+        rest[0] = 0; // No profit as we haven't done anything
+
+        for (int i = 1; i < n; i++) {
+            buy[i] = Math.max(buy[i - 1], rest[i - 1] - prices[i]);
+            sold[i] = buy[i - 1] + prices[i];
+            rest[i] = Math.max(rest[i - 1], sold[i - 1]);
         }
 
-        for (int i = 2; i <= n; i++) {
-            buy[i] = Math.max(buy[i - 1], sell[i - 2] - prices[i - 1]);
-
-            sell[i] = Math.max(sell[i - 1], buy[i - 1] + prices[i - 1]);
-        }
-        return sell[n];
-
+        return Math.max(sold[n - 1], rest[n - 1]);
     }
 
-    public static void main(String[] args) {
-        new StockBuySellWithCoolDown().maxProfitExtraSpace(new int[]{1, 2, 3, 0, 2});
+    public int maxProfitExtraSpace(int[] prices) {
+        int n = prices.length;
+        if (n < 2) return 0;
+
+        int[][] dp = new int[n][2];
+
+        // Base cases
+        dp[0][0] = 0;
+        dp[0][1] = -prices[0];
+        dp[1][0] = Math.max(dp[0][0], dp[0][1] + prices[1]);
+        dp[1][1] = Math.max(dp[0][1], dp[0][0] - prices[1]);
+
+        for (int i = 2; i < n; i++) {
+            dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] + prices[i]);
+            // (buy) state now considers the previous two days' state (dp[i - 2][0])
+            // instead of just the previous day.
+            // This is to account for the cool-down period,
+            dp[i][1] = Math.max(dp[i - 1][1], dp[i - 2][0] - prices[i]);
+        }
+
+        return dp[n - 1][0];
     }
 
     public int maxProfitRecursive(int[] prices) {

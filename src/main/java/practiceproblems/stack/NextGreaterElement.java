@@ -1,16 +1,10 @@
 package practiceproblems.stack;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Stack;
+import java.util.*;
 
-/**
- * https://www.geeksforgeeks.org/next-greater-element/
- * <p>
- * https://www.geeksforgeeks.org/find-next-greater-number-set-digits/
- */
+// Monotonic Stack: By iterating from right to left,
+// we can maintain a monotonic stack (a stack where elements are in increasing order from top to bottom)
+// https://leetcode.com/problems/next-greater-element-i/
 class NextGreaterElement {
 
     static int arr[] = {1, 3, 4, 2};
@@ -32,54 +26,6 @@ class NextGreaterElement {
         for (int i = 0; i < arr.length; i++)
             System.out.println(arr[i] + " --> " + nge[i]);
 
-    }
-
-    //     Input: nums1 = [4,1,2], nums2 = [1,3,4,2].
-    //     Output: [-1,3,-1]
-    // Explanation:
-    //     For number 4 in the first array, you cannot find the next greater number for it in the second array, so output -1.
-    //     For number 1 in the first array, the next greater number for it in the second array is 3.
-    //     For number 2 in the first array, there is no next greater number for it in the second array, so output -1.
-    public int[] nextGreaterElement(int[] findNums, int[] nums) {
-        int[] ret = new int[findNums.length];
-        ArrayDeque<Integer> stack = new ArrayDeque<>();
-        HashMap<Integer, Integer> map = new HashMap<>();
-        for (int i = nums.length - 1; i >= 0; i--) {
-            while (!stack.isEmpty() && stack.peek() <= nums[i]) {
-                stack.pop();
-            }
-            if (stack.isEmpty()) map.put(nums[i], -1);
-            else map.put(nums[i], stack.peek());
-            stack.push(nums[i]);
-        }
-        for (int i = 0; i < findNums.length; i++) {
-            ret[i] = map.get(findNums[i]);
-        }
-        return ret;
-    }
-
-    public int[] nextGreaterElementBruteForce(int[] nums1, int[] nums2) {
-        HashMap<Integer, Integer> hash = new HashMap<>();
-        for (int i = 0; i < nums2.length; i++) {
-            hash.put(nums2[i], i);
-        }
-
-        int[] res = new int[nums1.length];
-        int j;
-
-        for (int i = 0; i < nums1.length; i++) {
-            for (j = hash.get(nums1[i]) + 1; j < nums2.length; j++) {
-                if (nums1[i] < nums2[j]) {
-                    res[i] = nums2[j];
-                    break;
-                }
-            }
-            if (j == nums2.length) {
-                res[i] = -1;
-            }
-        }
-
-        return res;
     }
 
     //     Input: [1,2,1]
@@ -110,13 +56,81 @@ class NextGreaterElement {
 
         return result;
     }
+
+    public static int[] prevSmallerElement(int[] nums) {
+        int[] res = new int[nums.length];
+        Arrays.fill(res, -1);
+        int n = nums.length;
+        Deque<Integer> stack = new ArrayDeque<>();
+        for (int i = 0; i < nums.length; i++) {
+            while (!stack.isEmpty() && nums[stack.peek()%n] > nums[i%n]) {
+                stack.pop();
+            }
+            res[i%n] = stack.isEmpty() ? -1 : nums[stack.peek() % n];
+            stack.push(i);
+        }
+        return res;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(prevSmallerElement(new int[]{4, 5, 2, 10, 8})));
+
+    }
+
+    //     Input: nums1 = [4,1,2], nums2 = [1,3,4,2].
+    //     Output: [-1,3,-1]
+    // Explanation:
+    //     For number 4 in the first array, you cannot find the next greater number for it in the second array, so output -1.
+    //     For number 1 in the first array, the next greater number for it in the second array is 3.
+    //     For number 2 in the first array, there is no next greater number for it in the second array, so output -1.
+    public int[] nextGreaterElement(int[] findNums, int[] nums) {
+        int[] ret = new int[findNums.length];
+        Arrays.fill(ret,-1);
+        ArrayDeque<Integer> stack = new ArrayDeque<>();
+        for (int i = nums.length - 1; i >= 0; i--) {
+            // Remove elements from the stack that are less than
+            // or equal to the current element
+            while (!stack.isEmpty() && stack.peek() <= nums[i]) {
+                stack.pop();
+            }
+
+            ret[i] = stack.isEmpty()?-1:stack.peek();
+            stack.push(nums[i]);
+        }
+        return ret;
+    }
+
+    public int[] nextGreaterElementBruteForce(int[] nums1, int[] nums2) {
+        HashMap<Integer, Integer> hash = new HashMap<>();
+        for (int i = 0; i < nums2.length; i++) {
+            hash.put(nums2[i], i);
+        }
+
+        int[] res = new int[nums1.length];
+        int j;
+
+        for (int i = 0; i < nums1.length; i++) {
+            for (j = hash.get(nums1[i]) + 1; j < nums2.length; j++) {
+                if (nums1[i] < nums2[j]) {
+                    res[i] = nums2[j];
+                    break;
+                }
+            }
+            if (j == nums2.length) {
+                res[i] = -1;
+            }
+        }
+
+        return res;
+    }
+
     public int[] nextGreaterElementCircularBruteForce(int[] nums) {
         int[] res = new int[nums.length];
         int[] doublenums = new int[nums.length * 2];
         System.arraycopy(nums, 0, doublenums, 0, nums.length);
         System.arraycopy(nums, 0, doublenums, nums.length, nums.length);
         for (int i = 0; i < nums.length; i++) {
-            res[i]=-1;
+            res[i] = -1;
             for (int j = i + 1; j < doublenums.length; j++) {
                 if (doublenums[j] > doublenums[i]) {
                     res[i] = doublenums[j];
@@ -127,7 +141,20 @@ class NextGreaterElement {
         return res;
     }
 
-    public static void main(String[] args) {
-        printNGE();
+    public static int[] count_NGEs(int N, int arr[], int queries, int indices[]) {
+        int[] result = new int[N];
+        Deque<Integer> stack = new ArrayDeque<>();
+        for(int i= N-1; i>=0 ; i--){
+            while(!stack.isEmpty() && arr[stack.peek()] <= arr[i]){
+                stack.pop();
+            }
+            result[i] = stack.size();
+            stack.push(i);
+        }
+        int[] ans = new int[queries];
+        for(int i=0;i<queries;i++){
+            ans[i] = result[indices[i]];
+        }
+        return ans;
     }
 }

@@ -1,7 +1,7 @@
 package dynamicProgramming.subsequence;
 
 // https://www.naukri.com/code360/problems/rod-cutting-problem
-public class RodCutting {
+public class RodCuttingMaximise {
     public static int cutRod(int price[], int n) {
         Integer[][] cache = new Integer[price.length][n + 1];
         return recursionUtil(price, price.length - 1, n, cache);

@@ -12,7 +12,7 @@ import java.util.Deque;
 public class SumOfMinSubArrays {
 
     public static void main(String[] args) {
-        sumSubarrayMins(new int[]{5, 3, 4, 1, 2, 7});
+        System.out.println(sumSubarrayMins(new int[]{5, 3, 4, 1, 2, 7}));
     }
 
     public static int sumSubarrayMins(int[] arr) {

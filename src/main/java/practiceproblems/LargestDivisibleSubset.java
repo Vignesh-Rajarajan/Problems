@@ -1,66 +1,48 @@
 package practiceproblems;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-/**
- * Given a set of distinct positive integers,
- * find the largest subset such that every pair (Si, Sj) of elements in this subset satisfies:
-   Si % Sj = 0 or Sj % Si = 0.
-   If there are multiple solutions, return any subset is fine.
-   Input: [2,3,4,6,10,8,24]
-    Output: [2,4,8,24] each pair's modulo is 0
- */
+// https://leetcode.com/problems/largest-divisible-subset/
 public class LargestDivisibleSubset {
 
     /**
      * if a%b==0 means a>b, if b>a then the ans is b itself
-     *inorder to have that we need to sort the array in increasing order
-     at first each val is ans to itself, then we come from last so a is higher in a%b
-     for ex if 2 is factor of 4 then include  the set involve in available. This is DP problem
-                                [2,   3,   4,  6,     8,   10,  24] 
-                                 {2}  {3} {4}  {6}   {8}  {10} {24}
-                                                   {8,24}
-
-                                              {6,24}
-
-                                         {4,8,24}
-
-                                      {3,6,24}
-                                      
-                                {2,4,8,24}
-     * 
+     * inorder to have that we need to sort the array in increasing order
      */
     public List<Integer> largestDivisibleSubset(int[] nums) {
-        if(nums==null || nums.length==0) return Collections.emptyList();
-        
+        int n = nums.length;
+        Map<Integer, List<Integer>> map = new HashMap<>();
         Arrays.sort(nums);
-        List<Integer>[] result= new ArrayList[nums.length];
+        int[] lis = new int[n];
+        Arrays.fill(lis, 1);
+        for (int i = 0; i < n; i++) {
+            map.computeIfAbsent(i, x -> new ArrayList<>()).add(nums[i]);
+        }
 
-        int maxLength=0;
-        int resIndex=-1;
-        List<Integer> tempList;
+        int maxLength = -1;
 
-        for(int i=nums.length-1;i>=0;i--){
-            result[i]=new ArrayList<>(); // every element is an answer itself
-            tempList= new ArrayList<>();
-            result[i].add(nums[i]);
-            for(int j=i+1;j<nums.length;j++){
-                if(nums[j]%nums[i]==0){ // when mod is zero, check for greater list size that posis has
-                    if(result[j].size() > tempList.size()){ // this is to take even if 1 element is at j position
-                        tempList=result[j]; // the reason we take list is consider 4,8,24 when i is at 4 and j is 8 mod is 0 means 4%24 is also zero
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] % nums[j] == 0 || nums[j] % nums[i] == 0) {
+                    if (lis[j] + 1 > lis[i]) {
+                        lis[i] = lis[j] + 1;
+                        map.get(i).clear();
+                        map.get(i).addAll(map.get(j));
+                        map.get(i).add(nums[i]);
                     }
                 }
             }
-            result[i].addAll(tempList);
-            if(result[i].size()>maxLength){
-                maxLength=result[i].size();
-                resIndex=i;
+
+            maxLength = Math.max(maxLength, lis[i]);
+
+        }
+
+        for (int key : map.keySet()) {
+            if (map.get(key).size() == maxLength) {
+                return new ArrayList<>(map.get(key));
             }
         }
-        Collections.sort(result[resIndex]);
-        return result[resIndex];
+
+        return new ArrayList<>();
     }
 }

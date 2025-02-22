@@ -10,47 +10,56 @@ public class SudokuSolver {
         solveBoard(board, 0, 0);
     }
 
-    private boolean solveBoard(char[][] board, int currentRow, int currentCol) {
-        for (int row = currentRow; row < 9; row++, currentCol = 0) {
-            for (int col = currentCol; col < 9; col++) {
-                if (board[row][col] == '.') {
-                    for (char num = '1'; num <= '9'; num++) {
-                        if (isValid(board, row, col, num)) {
-                            board[row][col] = num;
-                            if (solveBoard(board, row, col + 1)) {
-                                return true;
-                            }
-                            board[row][col] = '.';
-                        }
-                    }
+    private boolean solveBoard(char[][] board, int row, int col) {
+        if (col == 9) {
+            row++;
+            col = 0;
+        }
+        if (row == 9) return true;
 
-                    return false;
+        if (board[row][col] != '.') {
+            return solveBoard(board, row, col + 1);
+        }
+
+        for (char num = '1'; num <= '9'; num++) {
+            if (isValid(board, row, col, num)) {
+                board[row][col] = num;
+                if (solveBoard(board, row, col + 1)) { // We only need to find ONE valid solution
+                    // Without this check, we would keep exploring even after finding a solution
+                    return true;
                 }
             }
         }
-
-        return true;
+        board[row][col] = '.';
+        return false;
     }
 
     // Make sure the digit doesn't exist in the current row, col or square.
     private boolean isValid(char[][] board, int row, int col, char num) {
-        int regionRow = (row / 3) * 3;  //region start row
-        int regionCol = (col / 3) * 3;  //region start col
+        // Check row
         for (int i = 0; i < 9; i++) {
-            //  [regionRow + i / 3][regionCol + i % 3] check 3*3 block
-            if (board[i][col] == num || board[row][i] == num || board[regionRow + i / 3][regionCol + i % 3] == num) {
-                return false;
+            if (board[row][i] == num) return false;
+        }
+
+        // Check column
+        for (int i = 0; i < 9; i++) {
+            if (board[i][col] == num) return false;
+        }
+
+        // Check 3x3 box
+        int boxRow = row - row % 3;
+        int boxCol = col - col % 3;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[boxRow + i][boxCol + j] == num) return false;
             }
         }
 
         return true;
     }
 
-
     /**
      * start from 0 and go till 81 (9*9), for each cell do a dfs, if not backtrack and change the value
-     *
-     * @param board
      */
     public void solveSudokuDFS(char[][] board) {
         dfs(board, 0);
