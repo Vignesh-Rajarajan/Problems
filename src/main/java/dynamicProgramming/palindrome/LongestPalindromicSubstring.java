@@ -5,41 +5,38 @@ package dynamicProgramming.palindrome;
  */
 public class LongestPalindromicSubstring {
 
-    public static String longestPalindrome(String s) {
-        int len = s.length();
-        if (len < 2)
+    public static void main(String[] args) {
+        System.out.println(("bananas"));
+    }
+
+    public String longestPalindrome(String s) {
+        if (s == null || s.length() < 2) {
             return s;
-        int[] maxStart = new int[1], maxEnd = new int[1];
-        // odd length ababc => here we start j and k at same position say index 2 and go left and right
-        // even length cbbd=> here let's say we're at index 1, we need to take 1 and 2 index to check for palindrome
-        // the above cases are the reason for sending i and i+1
-        for (int i = 0; i < s.length() - 1; i++) {
-            extend(s, i, i, maxStart, maxEnd);
-            extend(s, i, i + 1, maxStart, maxEnd);
         }
+        String longest = "";
+        for (int i = 0; i < s.length(); i++) {
+            // Check for odd-length palindromes
+            String oddPalindrome = expandAroundCenter(s, i, i);
+            // Check for even-length palindromes
+            String evenPalindrome = expandAroundCenter(s, i, i + 1);
 
-        return s.substring(maxStart[0], maxEnd[0] + 1);
+            // Update longest palindrome found so far
+            if (oddPalindrome.length() > longest.length()) {
+                longest = oddPalindrome;
+            }
+            if (evenPalindrome.length() > longest.length()) {
+                longest = evenPalindrome;
+            }
+        }
+        return longest;
     }
 
-    private static void extend(String s, int i, int j, int[] maxStart, int[] maxEnd) {
-        // loop until meet invalid match
-        while (i >= 0 && j < s.length() && s.charAt(i) == s.charAt(j)) {
-            i--;
-            j++;
+    private String expandAroundCenter(String s, int left, int right) {
+        while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+            left--;
+            right++;
         }
-
-        i++;
-        j--; // back to the last valid match
-
-        if (j - i + 1 > maxEnd[0] - maxStart[0] + 1) {
-            maxStart[0] = i;
-            maxEnd[0] = j;
-        }
-    }
-
-
-    public static void main(String args[]) {
-
-        System.out.println(longestPalindrome("bananas"));
+        // Return the substring from left+1 to right-1 (since we went one step too far)
+        return s.substring(left + 1, right);
     }
 }

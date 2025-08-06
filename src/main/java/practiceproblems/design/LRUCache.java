@@ -15,9 +15,9 @@ class LRUCache {
         public DLLNode(int key, int val) {
             this.val = val;
             this.key = key;
+
         }
     }
-
     Map<Integer, DLLNode> map;
     DLLNode head;
     DLLNode tail;
@@ -104,9 +104,3 @@ class LRUCache1 {
     }
 
 }
-/**
- * Your LRUCache object will be instantiated and called as such:
- * LRUCache obj = new LRUCache(capacity);
- * int param_1 = obj.get(key);
- * obj.put(key,value);
- */

@@ -10,13 +10,10 @@ import java.util.Deque;
 public class MaxHistogram {
 
     /**
-     * Lets start by thinking of a brute force, naive solution.
+     * Let's start by thinking of a brute force, naive solution.
      * Pick two bars and find the maxArea between them and compare that to your global maxArea.
      * To do that, you’ll need to find the bar that “restricts” the height of the forming rectangle to its own height -
      * i.e; the bar with the minimum height between two bars.
-     *
-     * @param heights
-     * @return
      */
     public int largestRectangleAreaBruteForce(int[] heights) {
         if (heights.length == 1) return heights[0];
@@ -60,35 +57,24 @@ public class MaxHistogram {
      * The height of this rectangle is 6, and the width is i−stack[peek()]−1=> 4−2−1 => 1.
      */
     public static int largestRectangleArea(int[] heights) {
-        if (heights.length == 1) return heights[0];
-        int area = 0;
         int result = 0;
         Deque<Integer> stack = new ArrayDeque<>();
-        int i = 0;
-        while (i < heights.length) {
-            if (stack.isEmpty() || heights[stack.peekLast()] <= heights[i]) {
-                stack.addLast(i++);
-            } else {
-                int top = stack.removeLast();
-                if (stack.isEmpty()) {
-                    area = heights[top] * i;
-                } else {
-                    area = heights[top] * (i - stack.peekLast() - 1);
+        int n = heights.length;
 
-                }
-                result = Math.max(result, area);
+        for (int i = 0; i <= n; i++) {
+            // When we reach the end of the array, we use 0 as the height to force all remaining bars to be processed
+            // into area calculation
+            int h = (i == n) ? 0 : heights[i];
+
+            // While the stack is not empty and the current bar is shorter than the bar at the top of the stack
+            while (!stack.isEmpty() && h < heights[stack.peek()]) {
+                int height = heights[stack.pop()]; // Height of the bar at the top of the stack
+                int width = stack.isEmpty() ? i : (i - stack.peek() - 1); // Width of the rectangle
+                result = Math.max(result, height * width); // Update the maximum area
             }
 
-        }
-
-        while (!stack.isEmpty()) {
-            int top = stack.removeLast();
-            if (stack.isEmpty()) {
-                area = heights[top] * i;
-            } else {
-                area = heights[top] * (i - stack.peekLast() - 1);
-            }
-            result = Math.max(result, area);
+            // Push the current index onto the stack
+            stack.push(i);
         }
 
         return result;

@@ -1,12 +1,13 @@
 package linkedLists;
 
+import java.util.Comparator;
 import java.util.PriorityQueue;
 
 public class MergeKSortedLists {
 
     public ListNode mergeKLists(ListNode[] lists) {
         if (lists.length == 0) return null;
-        PriorityQueue<ListNode> queue = new PriorityQueue<>((a, b) -> Integer.compare(a.val, b.val));
+        PriorityQueue<ListNode> queue = new PriorityQueue<>(Comparator.comparingInt(a -> a.val));
 
         for (ListNode list : lists) {
             if (list != null) queue.offer(list);

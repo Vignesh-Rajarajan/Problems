@@ -37,16 +37,24 @@ public class LongestUniqueSubstring {
         return result;
     }
 
+    // tricky
     public static int lengthOfLongestSubstringOpt(String s) {
         int res = 0, n = s.length();
+        //it's an array that acts as a character position map.
         int[] arr = new int[256];
         int startIndex = 0;
         for (int curr = 0; curr < n; curr++) {
-            // if already seen, pick the next element as start Index
+            //This is where we check for duplicates.
+            //If this is greater than 0, it means we've seen s.charAt(curr) before.
+            //The value will be the index +1 where the previous occurrence was seen
+            //If we have already seen a character we will update the startindex
+            //to the next index of that character that was previously seen
             startIndex = Math.max(startIndex, arr[s.charAt(curr)]);
 
             res = Math.max(res, curr - startIndex + 1);
             // store curr+1=> next index, so that we can start from here
+            //"If I see this character again,
+            // start checking for uniqueness after this index."
             arr[s.charAt(curr)] = curr + 1;
         }
         return res;

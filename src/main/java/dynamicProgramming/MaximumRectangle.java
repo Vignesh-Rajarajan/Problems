@@ -4,6 +4,8 @@ import practiceproblems.stack.MaxHistogram;
 
 import java.util.Arrays;
 
+import static practiceproblems.stack.MaxHistogram.largestRectangleArea;
+
 /**
  * At every row the height and area of rectangle varies, if the last row(base) is having a zero value
  * then that portion have to be avoided, this is the reason we take maxHistogram after every row
@@ -21,35 +23,21 @@ import java.util.Arrays;
 public class MaximumRectangle {
 
     public static int maximalRectangle(char[][] matrix) {
-        if (matrix.length == 0) return 0;
-        int[] row = new int[matrix[0].length];
+        int m = matrix.length;
+        int n = matrix[0].length;
+        int[][] hist = new int[m][n];
         int result = 0;
-        for (char[] arr : matrix) {
-            int i = 0;
-            // for each cell with value=1, we look upward (north),
-            // the number of continuous '1' is the height of cell
-            //First initiate the height array as 1 1 0 1 0 1, which is just a copy of the first row.
-            // Then we can easily calculate the max area is 2.
-            //Then update the array. We scan the second row, when the matrix[1][i] is 0, set the height[i] to 0
-            //else height[i] += 1, which means the height has increased by 1. So the height array again becomes 0 2 0 0 1 2.
-            // The max area now is also 2.
-            for (char c : arr) {
-                if (c - '0' > 0) {
-                    row[i] += c - '0';
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (matrix[i][j] == '1') {
+                    // If the current cell is '1', add to the height from the previous row
+                    hist[i][j] = (i == 0) ? 1 : hist[i - 1][j] + 1;
                 } else {
-                    row[i] = 0;
+                    // If the current cell is '0', reset the height to 0
+                    hist[i][j] = 0;
                 }
-
-                i++;
             }
-            /** The result row for every iteration
-             * [1, 0, 1, 0, 0]
-             * [2, 0, 2, 1, 1]
-             * [3, 1, 3, 2, 2]
-             * [4, 0, 0, 3, 0]
-             */
-            System.out.println(Arrays.toString(row));
-            result = Math.max(result, MaxHistogram.largestRectangleArea(row));
+            result = Math.max(result,largestRectangleArea(hist[i]));
         }
 
         return result;

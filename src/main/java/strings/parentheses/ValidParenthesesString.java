@@ -2,64 +2,23 @@ package strings.parentheses;
 
 /**
  * tricky braces
- *
  * https://leetcode.com/problems/valid-parenthesis-string/discuss/543521/Java-Count-Open-Parenthesis-O(n)-time-O(1)-space-Picture-Explain
  */
 public class ValidParenthesesString {
-    public boolean checkValidString(String s) {
-        int cmin = 0;
-        int cmax = 0; // open parentheses count in range [cmin, cmax]
-        for (char c : s.toCharArray()) {
-            if (c == '(') {
-                cmax++;
-                cmin++;
-            } else if (c == ')') {
-                cmax--;
-                cmin--;
-            } else if (c == '*') {
-                cmax++; // if `*` become `(` then openCount++
-                cmin--; // if `*` become `)` then openCount--
-                // if `*` become `` then nothing happens
-                // So openCount will be in new range [cmin-1, cmax+1]
-            }
-
-            /**
-             * Case - 1:
-             * If cmax < 0, the number of ')' is lesser than 0. We immediately return false.
-             * Why : Let's take an example "())", in this case, cmax would be less than 0 because we have two ' )' and only one '('.
-             * Now irrespective of how many '*' we have, this sequence is already invalid, hence we return false.
-             */
-            if (cmax < 0) {
-                return false; // Currently, don't have enough open parentheses to match close parentheses-> Invalid
-            }
-
-            /**
-             * Case - 2:
-             * cmin = Math.max(cmin, 0)
-             *
-             * The way I got to wrap my head around this was:
-             * Cmin and Cmax are both subtracted by 1, whenever we encounter a ")".
-             * Therefore, Case -1 covers the case in which we have more ")" than "(".
-             * Now the additional case we have to look at is, when we have extra ")", which we can account to the "*" [Since we do --cmin here].
-             *
-             * However, we can just ignore the "*" as empty strings in this case.
-             * Example: "( ) * * "
-             * cmax = 1 0 1 2
-             * cmin = 1 0 0 0 -> We don't want the last two to become 1 0 -1 -2
-             *
-             * We can see that the cmin values would become -1 and -2 for the last two "*".
-             * However this would mean we would be adding additional ")", which makes the sequence "()))".
-             * This is not a right sequence. Therefore, we must keep them as empty strings.
-             * Hence we do a max with 0, which implies that if we have additional "*", we don't take them as ")", instead we treat them as empty strings.
-             */
-            // For example: ())(
-            cmin = Math.max(cmin, 0);   // It's invalid if open parentheses count < 0 that's why cmin can't be negative
-        }
-        return cmin == 0; // Return true if can found `openCount == 0` in range [cmin, cmax]
-    }
-
+    //A single pass treating * as ( or ) isn't enough. The two passes ensure:
+    //We don't have too many ) at any point (left-to-right)
+    //We don't have too many ( at any point (right-to-left)
+    //First Pass (Left to Right)
+    //Treat all * as (
+    //Track balance (increment for ( or *, decrement for ))
+    //If balance ever goes negative, it's invalid
+    //Second Pass (Right to Left)
+    //Treat all * as )
+    //Track balance (increment for ) or *, decrement for ()
+    //If balance ever goes negative, it's invalid
+    //If both passes succeed, the string is valid.
     public boolean checkValidStringAnother(String s) {
-        if (s.length() < 1) return true;
+        if (s.isEmpty()) return true;
 
         int balance = 0;
         for (int i = 0; i < s.length(); i++) {
@@ -77,6 +36,20 @@ public class ValidParenthesesString {
             if (balance < 0) return false;
 
         }
+        //After both passes succeed (didn't return false early),
+        // we can be certain the string is valid regardless of the final balance value
+        // since this * characters give us flexibility to adjust the balance as needed in positive way
+        // What matters is that both passes never hit a negative balance (which would make it impossible to balance)
+        //Consider s = "(*)":
+        //First Pass (L→R, * as ():
+        //'(': balance = 1
+        //'*': balance = 2
+        //')': balance = 1 → Final balance = 1 (not 0)
+        //Second Pass (R→L, * as )):
+        //')': balance = 1
+        //'*': balance = 2
+        //'(': balance = 1 → Final balance = 1 (not 0)
+        //Yet this string is valid (we could treat * as empty). Both passes succeeded (never went negative), so we return true despite non-zero balances.
         return true;
     }
 }

@@ -1,15 +1,6 @@
 package graph.leetcode;
 
-/**
- * In a town, there are N people labelled from 1 to N.  There is a rumor that one of these people is secretly the town judge.
- *
- * If the town judge exists, then:
- *
- * The town judge trusts nobody.
- * Everybody (except for the town judge) trusts the town judge.
- * There is exactly one person that satisfies properties 1 and 2.
- * You are given trust, an array of pairs trust[i] = [a, b] representing that the person labelled a trusts the person labelled b.
- */
+//https://leetcode.com/problems/find-the-town-judge/
 public class FindJudge {
     public int findJudge(int N, int[][] trust) {
         if(trust.length==0 && N==1) return 1;

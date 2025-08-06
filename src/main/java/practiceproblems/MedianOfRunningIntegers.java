@@ -1,6 +1,5 @@
 package practiceproblems;
 
-import java.util.Collections;
 import java.util.PriorityQueue;
 
 /**
@@ -8,49 +7,65 @@ import java.util.PriorityQueue;
  */
 public class MedianOfRunningIntegers {
 
-    PriorityQueue<Integer> upperHalf = new PriorityQueue<>();
-    PriorityQueue<Integer> lowerHalf = new PriorityQueue<>(Collections.reverseOrder());
+    PriorityQueue<Integer> minQueue; // holds the larger half
+    PriorityQueue<Integer> maxQueue; // holds the smaller half
 
-    // 6,8,1,4,9,2,3,5
-    // median is a middle element in sorted array
-    // in a sorted array if we choose a point the immediate left to that point is maxLeft (max of all left)
-    // the immediate right to that point is minRight (min of all right)
-    // to mimic that here the right(max) values are stored in min heap
-    // the left(min) values are stored in maxheap
-    //  maxHeap.. i.. minHeap
-    // if odd return from maxHeap
+    public MedianOfRunningIntegers() {
+        minQueue = new PriorityQueue<>(); // min heap
+        maxQueue = new PriorityQueue<>((a, b) -> b - a); // max heap
+    }
+
+    //Since maxQueue holds the smaller half, we tentatively place the new number here.
+    //Why? Because the new number might belong in the smaller half, or it might need to move to the larger half. We'll fix this in the next step.
+    //Move the largest from maxQueue to minQueue:
+    //After adding to maxQueue, we move its largest element (the new number or an existing one) to minQueue.
+    //Why? This ensures that the ordering invariant is maintained: everything in maxQueue ≤ everything in minQueue.
+    //Rebalance the sizes:
+    //If minQueue has more elements than maxQueue, move the smallest element from minQueue back to maxQueue.
+    //Why? This ensures the balancing invariant: maxQueue is always equal or one larger than minQueue.
+
+    //Adding 1, 2, 3:
+    //Add 1:
+    //maxQueue: [1]
+    //minQueue: []
+    //After rebalancing: maxQueue: [1], minQueue: [].
+    //Add 2:
+    //maxQueue: [2, 1] (after adding 2), then [1] (after polling 2)
+    //minQueue: [2] (after adding the polled 2)
+    //Now maxQueue.size() (1) < minQueue.size() (1) is false, so no rebalancing.
+    //Final state:
+    //maxQueue: [1]
+    //minQueue: [2]
+    //Add 3:
+    //maxQueue: [3, 1] (after adding 3), then [1] (after polling 3)
+    //minQueue: [2, 3] (after adding the polled 3)
+    //Now maxQueue.size() (1) < minQueue.size() (2), so move 2 back to maxQueue:
+    //maxQueue: [2, 1]
+    //minQueue: [3]
+    //Final state:
+    //maxQueue: [2, 1]
+    //minQueue: [3]
+
     public void addNum(int num) {
-        // Insert in lowerHalf if it's empty or
-        // if number being inserted is less than the peek of lowerHalf otherwise insert in upperHalf
-        if (lowerHalf.isEmpty() || num <= lowerHalf.peek()) {
-            lowerHalf.add(num);
-        } else {
-            upperHalf.add(num);
-        }
+        maxQueue.offer(num);
+        minQueue.offer(maxQueue.poll());
 
-        // We also need to ensure that the halves are balanced i.e.
-        // there is no more than a difference of 1 in size of both halves
-        // Let lowerHalf be the one to hold one extra element if the size of total
-        // data stream is odd otherwise be equal to upperHalf
-        if (upperHalf.size() > lowerHalf.size()) { // If an element added above made upperHalf have one more element than lowerHalf then we poll it and put it into lowerHalf
-            lowerHalf.add(upperHalf.poll());
-        } else if (lowerHalf.size() > upperHalf.size() + 1) {
-            // If an element added above, made lowerHalf have 2 more elements then upperHalf then we put one into upperHalf from lowerHalf
-            upperHalf.add(lowerHalf.poll());
+        if (maxQueue.size() < minQueue.size()) {
+            maxQueue.offer(minQueue.poll());
         }
     }
 
     public double findMedian() {
-        if (lowerHalf.size() == upperHalf.size()) {
-            return (lowerHalf.peek() + upperHalf.peek()) / 2.0;
+        if (maxQueue.size() > minQueue.size()) {
+            return maxQueue.peek();
         } else {
-            return lowerHalf.peek();
+            return (maxQueue.peek() + minQueue.peek()) / 2.0;
         }
     }
 
     public static void main(String[] args) {
         MedianOfRunningIntegers median = new MedianOfRunningIntegers();
-        int A[] = {5, 15, 1, 3, 2, 8, 7, 9, 10, 6, 11, 4};
+        int []A = {5, 15, 1, 3, 2, 8, 7, 9, 10, 6, 11, 4};
         for (int num : A) {
             median.addNum(num);
             System.out.println(median.findMedian());

@@ -36,16 +36,15 @@ public class TaskLeastInterval {
         // Move time forward by n + 1
         // Return time in the end.
         while (!queue.isEmpty()) {
-            int k = n + 1;  //n slots for the gap and 1 for the task itself, At each iteration, we process at most 'n' elements,
-                            // and move forwards exactly n+1 in time
+            int slots = n + 1;  // Number of tasks we can execute before cooldown
             List<Pair> tempList = new ArrayList<>();
 
-            while (k > 0 && !queue.isEmpty()) {
+            while (slots > 0 && !queue.isEmpty()) {
                 Pair temp = queue.poll();  // most frequency task
                 temp.freq -= 1; // decrease frequency, meaning it got executed
                 tempList.add(temp); // collect task to add back to queue
                 result++; //successfully executed task
-                k--;
+                slots--;
             }
 
             for (Pair t : tempList) {
@@ -54,10 +53,27 @@ public class TaskLeastInterval {
 
             if (queue.isEmpty()) break;
 
-            result += k; // if k > 0, then it means we need to be idle
+            result += slots; // if k > 0, then it means we need to be idle
 
         }
         return result;
+    }
+
+    public int leastIntervalOptimised(char[] tasks, int n) {
+        int maxCount = 0, maxFreq = 0;
+        int[] count = new int[26];
+        for (char task: tasks) {
+            count[task - 'A']++;
+        }
+        for (int val: count) {
+            if (val > maxFreq) {
+                maxFreq = val;
+                maxCount = 1;
+            } else if (val == maxFreq) {
+                maxCount++;
+            }
+        }
+        return Math.max((n + 1) * (maxFreq - 1) + maxCount, tasks.length);
     }
 
     public static void main(String[] args) {

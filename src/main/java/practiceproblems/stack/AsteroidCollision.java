@@ -15,15 +15,16 @@ public class AsteroidCollision {
             if (asteroid > 0) { // Pushing all +ve asteroid
                 stack.push(asteroid);
             } else {
-                // Remove all positive asteroid before our current asteroid
-                while (!stack.isEmpty() && stack.peek() > 0 && Math.abs(stack.peek()) < Math.abs(asteroid))
+                // This loop removes all positive asteroids from the stack that are smaller than the current negative asteroid.
+                while (!stack.isEmpty() && stack.peek() > 0 && Math.abs(stack.peek()) < Math.abs(asteroid)) {
                     stack.pop();
+                }
                 // Checking if the stack is empty or the recent asteroid is negative!
-                if (stack.isEmpty() || stack.peek() < 0)
+                if (stack.isEmpty() || stack.peek() < 0) {
                     stack.push(asteroid);
-                    // If recent asteroid <= our asteroid, We broke our outer loop if equal we pop it.
-                else if (stack.peek() == Math.abs(asteroid))
-                    stack.pop();
+                } else if (stack.peek() == Math.abs(asteroid)) {
+                    stack.pop();  // This ensures that when two asteroids of equal size collide, both are destroyed, and neither is added to the stack.
+                }
             }
         }
         int[] output = new int[stack.size()];

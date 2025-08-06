@@ -3,29 +3,34 @@ package strings.parentheses;
 // https://leetcode.com/problems/remove-outermost-parentheses/
 public class RemoveOuterParentheses {
 
-    /**
-     * opened count the number of opened parenthesis.
-     * Add every char to the result,
-     * unless the first left parenthesis,
-     * and the last right parenthesis.
-     * @param s
-     * @return
-     */
     public String removeOuterParentheses(String s) {
-        int opened = 0;
-        StringBuilder sb = new StringBuilder();
+        int depth = 0;              // Tracks how many levels deep we are in parentheses
+        StringBuilder result = new StringBuilder();
 
         for (int i = 0; i < s.length(); i++) {
-            char ch = s.charAt(i);
-            if (ch == '(') {
-                if (opened > 0) sb.append(ch);
-                opened++;
-
+            char current = s.charAt(i);
+            if (current == '(') {
+                // Only add '(' if it's not the outermost one
+                if (depth > 0) {
+                    result.append(current);
+                }
+                depth++;  // Go one level deeper
             } else {
-                if (opened > 1) sb.append(ch);
-                opened--;
+                depth--;  // Come one level up
+                // Only add ')' if it's not the outermost one
+                if (depth > 0) {
+                    result.append(current);
+                }
             }
         }
-        return sb.toString();
+
+        //Example with "( ( ) ( ) )":
+        //First ( - Outer layer (depth=0) → Don't keep
+        //Second ( - Inner layer (depth=1) → Keep
+        //First ) - Still inside (depth=1) → Keep
+        //Third ( - Inner layer (depth=1) → Keep
+        //Second ) - Still inside (depth=1) → Keep
+        //Final ) - Outer layer (depth=0) → Don't keep
+        return result.toString();
     }
 }

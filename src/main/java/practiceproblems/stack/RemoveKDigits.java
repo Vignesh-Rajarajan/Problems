@@ -4,54 +4,49 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * https://leetcode.com/problems/remove-k-digits/
- *
- * Given a non-negative integer num represented as a string,
- * remove k digits from the number so that the new number is the smallest possible.
- *
- * Note:
- * The length of num is less than 10002 and will be ≥ k.
- * The given num does not contain any leading zero.
- *
- * Input: num = "1432219", k = 3
- * Output: "1219"
- * Explanation: Remove the three digits 4, 3, and 2 to form the new number 1219 which is the smallest.
- *
- * Input: num = "10", k = 2
- * Output: "0"
- * Explanation: Remove all the digits from the number and it is left with nothing which is 0.
+ * https://leetcode.com/problems/remove-k-digits
  */
 
 public class RemoveKDigits {
-    //1432219
-    public static String removeKdigits(String num, int k) { 
-        if(num==null || num.length()==0) return null;
-        
-        Deque<Integer> queue= new ArrayDeque<>();
-        for(char c: num.toCharArray()){
-            
-            while(!queue.isEmpty() && queue.getLast()>c-'0' && k>0){
-                queue.removeLast();
+    //Core Idea: Monotonically Increasing Stack
+    // Notice that removing a larger digit that comes before a
+    // smaller digit seems to reduce the number most effectively.
+    //  num = "4321", k = 2 the smallest is "21."
+    //  How did we get there? "By removing 4 and 3."
+    // 14232191
+    public static String removeKdigits(String num, int k) {
+        if (k == num.length()) return "0"; // Edge case: remove all digits
+
+        Deque<Character> stack = new ArrayDeque<>();
+
+        for (char digit : num.toCharArray()) {
+            while (!stack.isEmpty() && k > 0 && stack.peek() > digit) {
+                stack.pop();
                 k--;
             }
-            queue.addLast(c-'0');       
+            stack.push(digit);
         }
-         
-        while(k>0){
-            queue.removeLast();
+
+        // Remove extra digits if k is still greater than 0
+        while (k > 0 && !stack.isEmpty()) {
+            stack.pop();
             k--;
         }
-        
-        StringBuilder result= new StringBuilder();
-        while(!queue.isEmpty()){
-            result.append(queue.removeFirst());
+
+        // Build the final number string
+        StringBuilder result = new StringBuilder();
+        while (!stack.isEmpty()) {
+            result.append(stack.pop());
         }
-       
-        while(result.length()>0 && result.charAt(0)=='0'){
+
+        result.reverse();
+
+        // Remove leading zeros
+        while (result.length() > 1 && result.charAt(0) == '0') {
             result.deleteCharAt(0);
         }
-        
-        return result.length()==0?"0":result.toString();
+
+        return result.length() == 0 ? "0" : result.toString();
     }
 
     public static void main(String[] args) {

@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-// Input: [2, 3, 1, 8, 2, 3, 5, 1]
-// Output: 4, 6, 7
+// https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/
 public class FindMissingNumbers {
 
     //Brute Force
@@ -19,11 +18,11 @@ public class FindMissingNumbers {
         // cyclic sort begins
         while (i < nums.length) {
             int j = nums[i] - 1;
-            if (nums[i] != nums[j]) {
-                swap(nums, i, j);
-            } else {
+            if (nums[i] == nums[j]) {
                 i++;
+                continue;
             }
+            swap(nums, i, j);
         }
         // cyclic sort ends
         // when cyclic sort ends the i+1 element will be in correct index
@@ -34,6 +33,20 @@ public class FindMissingNumbers {
             i++;
         }
         return result;
+    }
+    public List<Integer> findDisappearedNumbersAlter(int[] nums) {
+        for (int num : nums) {
+            int i = Math.abs(num) - 1;
+            nums[i] = -Math.abs(nums[i]);
+        }
+
+        List<Integer> res = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] > 0) {
+                res.add(i + 1);
+            }
+        }
+        return res;
     }
 
     public void swap(int[] nums, int i, int j) {

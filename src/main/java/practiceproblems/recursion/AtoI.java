@@ -2,46 +2,39 @@ package practiceproblems.recursion;
 
 // https://leetcode.com/problems/string-to-integer-atoi/
 public class AtoI {
-
     public int myAtoi(String s) {
+        if (s == null || s.isEmpty()) return 0;
+
         int index = 0;
         int n = s.length();
-        int number = 0;
-        if (n == 0) return number;
         int sign = 1;
+        int result = 0;
+
+        // Skip leading whitespace
         while (index < n && s.charAt(index) == ' ') {
             index++;
         }
 
+        // Handle sign
         if (index < n && (s.charAt(index) == '-' || s.charAt(index) == '+')) {
-            if (s.charAt(index) == '-') {
-                sign = -1;
-            }
+            sign = (s.charAt(index) == '-') ? -1 : 1;
             index++;
         }
 
+        // Process digits
+        while (index < n && Character.isDigit(s.charAt(index))) {
+            int digit = s.charAt(index) - '0';
 
-        return recursion(s, index, number, sign);
-    }
+            // Check for overflow before actually multiplying and adding
+            if (result > Integer.MAX_VALUE / 10 ||
+                    (result == Integer.MAX_VALUE / 10 && digit > Integer.MAX_VALUE % 10)) {
+                return sign == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+            }
 
-    public int recursion(String s, int index, int number, int sign) {
-        if (index >= s.length() || !Character.isDigit(s.charAt(index))) {
-            return sign * number;
+            result = result * 10 + digit;
+            index++;
         }
 
-        int val = s.charAt(index) - '0';
-
-        if (number > Integer.MAX_VALUE / 10) {
-            return sign == -1 ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-        }
-
-        if (number == Integer.MAX_VALUE / 10 && val > 7) {
-            return sign == -1 ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-        }
-
-        number = (number * 10) + val;
-
-        return recursion(s, index + 1, number, sign);
-
+        return sign * result;
     }
 }

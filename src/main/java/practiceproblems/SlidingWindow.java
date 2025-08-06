@@ -21,9 +21,15 @@ public class SlidingWindow {
         List<Integer> result = new ArrayList<>();
 
         Deque<Integer> queue = new ArrayDeque<>();
-
+    // order to follow
+    // 1. Remove the elements which are out of this window
+    // 2. Remove the elements which are smaller than the current element
+    // 3. Add the current element
+    // 4. Add the maximum element to the result
         for (int i = 0; i < nums.length; i++) {
-            while (!queue.isEmpty() && queue.peek() < i - k + 1) {
+            // This step ensures that the queue only contains indices of elements
+            // that are within the current window of size k.
+            while (!queue.isEmpty() && queue.peekFirst() < i - k + 1) {
                 queue.removeFirst();
             }
             while (!queue.isEmpty() && nums[queue.peekLast()] < nums[i]) {
@@ -32,7 +38,7 @@ public class SlidingWindow {
 
             queue.addLast(i);
 
-            if (i >= k - 1) {
+            if (!queue.isEmpty() && i >= k - 1) {
                 result.add(nums[queue.peekFirst()]);
             }
         }

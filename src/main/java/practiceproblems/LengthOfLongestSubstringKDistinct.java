@@ -55,31 +55,47 @@ public class LengthOfLongestSubstringKDistinct {
         // current window. We can also use a map instead of a count array.
         int[] freq = new int[CHAR_RANGE];
 
-        // `[low…high]` maintains the sliding window boundaries
         for (int low = 0, high = 0; high < str.length(); high++) {
             window.add(str.charAt(high));
             freq[str.charAt(high)]++;
 
-            // if the window size is more than `k`, remove characters from the left
             while (window.size() > k) {
-                // If the leftmost character's frequency becomes 0 after
-                // removing it in the window, remove it from the set as well
                 if (--freq[str.charAt(low)] == 0) {
                     window.remove(str.charAt(low));
                 }
 
-                low++;        // reduce window size
+                low++;
             }
 
-            // update the maximum window size if necessary
             if (end - begin < high - low) {
                 end = high;
                 begin = low;
             }
         }
 
-        // return the longest substring found at `str[begin…end]`
         return str.substring(begin, end + 1);
+    }
+
+    public static int totalElements(Integer[] arr) {
+        int left=0, right=0;
+        Map<Integer,Integer> cache = new HashMap<>();
+        int result =0;
+        while(right<arr.length){
+            cache.put(arr[right],cache.getOrDefault(arr[right],0)+1);
+            while(cache.size()>2){
+                cache.put(arr[left],cache.getOrDefault(arr[left],0)-1);
+                if(cache.get(arr[left])<=0){
+                    cache.remove(arr[left]);
+                }
+                left++;
+            }
+
+            result = Math.max(result,right-left+1);
+            right++;
+
+        }
+
+        return result;
     }
 
 }

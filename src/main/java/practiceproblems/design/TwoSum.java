@@ -7,14 +7,12 @@ import java.util.Map;
 
 public class TwoSum {
 
-    // all numbers
-    private List<Integer> list = new ArrayList<>();
-
-    // every number's occurrence
-    private Map<Integer, Integer> map = new HashMap<>();
-
     // record max and minimum value
     int max, min;
+    // all numbers
+    private List<Integer> list = new ArrayList<>();
+    // every number's occurrence
+    private Map<Integer, Integer> map = new HashMap<>();
 
     /**
      * Initialize your data structure here.

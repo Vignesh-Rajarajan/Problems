@@ -5,63 +5,65 @@ package practiceproblems;
  * tricky
  */
 public class ReverseString {
-    public StringBuilder trimSpaces(String s) {
-        int left = 0, right = s.length() - 1;
-        // remove leading spaces
-        while (left <= right && s.charAt(left) == ' ') ++left;
+    public static void main(String[] args) {
+        ReverseString reverseString = new ReverseString();
 
-        // remove trailing spaces
-        while (left <= right && s.charAt(right) == ' ') --right;
-
-        // reduce multiple spaces to single one
-        StringBuilder sb = new StringBuilder();
-        while (left <= right) {
-            char c = s.charAt(left);
-
-            if (c != ' ')
-                sb.append(c);
-            else if (sb.charAt(sb.length() - 1) != ' ')
-                sb.append(c);
-
-            ++left;
-        }
-        return sb;
-    }
-
-    public void reverse(StringBuilder sb, int left, int right) {
-        while (left < right) {
-            char tmp = sb.charAt(left);
-            sb.setCharAt(left++, sb.charAt(right));
-            sb.setCharAt(right--, tmp);
-        }
-    }
-
-    public void reverseEachWord(StringBuilder sb) {
-        int n = sb.length();
-        int start = 0, end = 0;
-
-        while (start < n) {
-            // go to the end of the word
-            while (end < n && sb.charAt(end) != ' ') ++end;
-            // reverse the word
-            reverse(sb, start, end - 1);
-            // move to the next word
-            start = end + 1;
-            ++end;
-        }
+        String s2 = "  lets go to 'new york'  ";
+        System.out.println(reverseString.reverseWords(s2)); // Output: "'new york' to go lets"
     }
 
     public String reverseWords(String s) {
-        // converst string to string builder
-        // and trim spaces at the same time
-        StringBuilder sb = trimSpaces(s);
+        // Step 1: Replace spaces inside quotes with hyphens
+        char[] str = s.toCharArray();
+        boolean inQuote = false;
+        for (int i = 0; i < str.length; i++) {
+            if (str[i] == '\'') {
+                inQuote = !inQuote;
+            } else if (inQuote && str[i] == ' ') {
+                str[i] = '-';
+            }
+        }
 
-        // reverse the whole string
-        reverse(sb, 0, sb.length() - 1);
+        // Step 2: Reverse the entire string (your original code)
+        reverse(str, 0, str.length - 1);
 
-        // reverse each word
-        reverseEachWord(sb);
+        int start = 0, end = 0;
+        int n = str.length;
+        int resultPos = 0;
 
-        return sb.toString();
+        // Step 3: Process words (modified to handle hyphens)
+        while (end < n) {
+            while (end < n && str[end] == ' ') end++;
+            if (end == n) break;
+
+            if (resultPos > 0) {
+                str[resultPos++] = ' ';
+            }
+
+            start = resultPos;
+            while (end < n && str[end] != ' ') {
+                str[resultPos++] = str[end++];
+            }
+
+            reverse(str, start, resultPos - 1);
+        }
+
+        // Step 4: Convert hyphens back to spaces
+        for (int i = 0; i < resultPos; i++) {
+            if (str[i] == '-') {
+                str[i] = ' ';
+            }
+        }
+
+        return new String(str, 0, resultPos);
+    }
+
+    private void reverse(char[] arr, int i, int j) {
+        while (i < j) {
+            char tmp = arr[i];
+            arr[i++] = arr[j];
+            arr[j--] = tmp;
+        }
     }
 }
+

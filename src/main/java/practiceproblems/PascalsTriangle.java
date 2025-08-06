@@ -18,50 +18,44 @@ import java.util.List;
  */
 public class PascalsTriangle {
 
-    public List<List<Integer>> generate1(int numRows) {
-        List<List<Integer>> allrows = new ArrayList<>();
-        ArrayList<Integer> row = new ArrayList<>();
-        for (int i = 0; i < numRows; i++) {
-            // suppose if the row is [1,3,3,1]
-            // add 1 at start [1,1,3,3,1]
-            // then add together j and j+1 elements like below
-            // [1,4,3,3,1] => [1,4,6,3,1]=>[1,4,6,4,1]
-            row.add(0, 1);
-            for (int j = 1; j < row.size() - 1; j++)
-                row.set(j, row.get(j) + row.get(j + 1));
-            allrows.add(new ArrayList<>(row));// every time the copy is only appended
-        }
-        return allrows;
-
-    }
-
     public List<List<Integer>> generate(int numRows) {
         List<List<Integer>> triangle = new ArrayList<>();
 
-        // Base case; first row is always [1].
-        triangle.add(new ArrayList<>());
-        triangle.get(0).add(1);
-
-        for (int rowNum = 1; rowNum < numRows; rowNum++) {
+        for (int i = 0; i < numRows; i++) {
             List<Integer> row = new ArrayList<>();
-            List<Integer> prevRow = triangle.get(rowNum - 1);
+            row.add(1); // First element is always 1
 
-            // The first row element is always 1.
-            row.add(1);
-
-            // Each triangle element (other than the first and last of each row)
-            // is equal to the sum of the elements above-and-to-the-left and
-            // above-and-to-the-right.
-            for (int j = 1; j < rowNum; j++) {
-                row.add(prevRow.get(j - 1) + prevRow.get(j));
+            // Fill middle elements (if any)
+            for (int j = 1; j < i; j++) {
+                int prevVal = triangle.get(i - 1).get(j - 1);
+                int nextVal = triangle.get(i - 1).get(j);
+                row.add(prevVal + nextVal);
             }
 
-            // The last row element is always 1.
-            row.add(1);
+            if (i > 0) {
+                row.add(1);
+            }
 
             triangle.add(row);
         }
 
         return triangle;
+    }
+
+    public List<Integer> getRow(int rowIndex) {
+        List<Integer> row = new ArrayList<>();
+        row.add(1);
+        for (int i = 1; i <= rowIndex; i++) {
+            List<Integer> newRow = new ArrayList<>();
+            newRow.add(1);
+            for (int j = 1; j < row.size(); j++) {
+                newRow.add(row.get(j - 1) + row.get(j));
+            }
+            newRow.add(1);
+
+            row = new ArrayList<>(newRow);
+        }
+
+        return row;
     }
 }

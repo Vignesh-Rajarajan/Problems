@@ -98,7 +98,8 @@ public class JumpsToReachEnd {
         for (int i = 0; i < nums.length - 1; i++) { // loop till last jump hasn't taken us till the end
 
             //maxReachable is the maximum reachable index from index i.
-            // Consider this example 2, 3, 10, 1 in this case, maxReachable will be 12 at index 2 which says we can reach till 12th index but not the number of jumps.
+            // Consider this example 2, 3, 10, 1 in this case, maxReachable will be 12 at index 2
+            // which says we can reach till 12th index but not the number of jumps.
             // So, if you update it with number of jumps you get 12 where as answer is 2.
 
             curFarthest = Math.max(curFarthest, i + nums[i]);  //Updating the range of next level.

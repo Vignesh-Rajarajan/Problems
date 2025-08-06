@@ -1,8 +1,5 @@
 package practiceproblems.mergesort;
 
-/**
- * https://www.geeksforgeeks.org/counting-inversions/
- */
 class CountingInversion {
 
     static int mergeSort(int[] arr, int arrSize) {
@@ -58,5 +55,28 @@ class CountingInversion {
         //int arr[] = new int[] { 4, 6, 2, 1, 9, 7 };
         int arr[] = new int[]{5, 1, 4, 2};
         System.out.println("Number of inversions are " + mergeSort(arr, arr.length));
+    }
+
+    //https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/editorial/
+    public boolean check(int[] nums) {
+        int n = nums.length;
+        if (n <= 1) return true;
+
+        int inversionCount = 0;
+
+        // For every pair, count the number of inversions.
+        for (int i = 1; i < n; ++i) {
+            if (nums[i] < nums[i - 1]) {
+                ++inversionCount;
+                if (inversionCount > 1) return false;
+            }
+        }
+
+        // Also check between the last and the first element due to rotation
+        if (nums[0] < nums[n - 1]) {
+            ++inversionCount;
+        }
+
+        return inversionCount <= 1;
     }
 }

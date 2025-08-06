@@ -36,7 +36,7 @@ public class MinHeap {
         ensureExtraCapacity();
         elements[size] = itemToAdd;
         size++;
-        siftUp();
+        shiftUp();
     }
 
     public boolean isEmpty() {
@@ -67,74 +67,33 @@ public class MinHeap {
 
 
     private void heapifyDown() {
+    int index = 0;
 
-      /*
-        We will bubble down the item just swapped to the "top" of the heap
-        after a removal operation to restore the heap
-      */
-        int index = 0;
+    while (hasLeftChild(index)) {
+        int smallerChildIndex = getLeftChildIndex(index);
 
-      /*
-        Since a binary heap is a complete binary tree, if we have no left child
-        then we have no right child. So we continue to bubble down as long as
-        there is a left child.
-
-        A non-existent left child immediately tells us that a right child does
-        not exist.
-      */
-        while (hasLeftChild(index)) {
-        /*
-          By default, assume that left child is smaller. If a right
-          child exists see if it can overtake the left child by
-          being smaller
-        */
-            int smallerChildIndex = getLeftChildIndex(index);
-
-            if (hasRightChild(index) && rightChild(index) < leftChild(index)) {
-                smallerChildIndex = getRightChildIndex(index);
-            }
-
-        /*
-          If the item we are sitting on is < the smaller child then
-          nothing needs to happen & sifting down is finished.
-
-          But if the smaller child is smaller than the node we are
-          holding, we should swap and continue sifting down.
-        */
-            if (elements[index] < elements[smallerChildIndex]) {
-                break;
-            } else {
-                swap(index, smallerChildIndex);
-            }
-
-            // Move to the node we just swapped down
-            index = smallerChildIndex;
+        if (hasRightChild(index) && rightChild(index) < leftChild(index)) {
+            smallerChildIndex = getRightChildIndex(index);
         }
-    }
 
-    // Bubble up the item we inserted at the "end" of the heap
-    private void siftUp() {
-      /*
-        We will bubble up the item just inserted into to the "bottom"
-        of the heap after an insert operation. It will be at the last index
-        so index 'size' - 1
-      */
+        if (elements[index] <= elements[smallerChildIndex]) {
+            break;
+        }
+
+        swap(index, smallerChildIndex);
+        index = smallerChildIndex;
+    }
+}
+
+    private void shiftUp() {
+
         int index = size - 1;
 
-      /*
-        While the item has a parent and the item beats its parent in
-        smallness, bubble this item up.
-      */
         while (hasParent(index) && elements[index] < parent(index)) {
             swap(getParentIndex(index), index);
             index = getParentIndex(index);
         }
     }
-
-    /************************************************
-     Helpers to access our array easily, perform
-     rudimentary operations, and manipulate capacity
-     ************************************************/
 
     private void swap(int indexOne, int indexTwo) {
         int temp = elements[indexOne];

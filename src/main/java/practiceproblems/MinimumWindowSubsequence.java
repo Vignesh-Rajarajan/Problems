@@ -11,7 +11,7 @@ package practiceproblems;
 // unresolved
 public class MinimumWindowSubsequence  {
     public String minWindow(String S, String T) {
-        if (S.length() == 0 || T.length() == 0) {
+        if (S.isEmpty() || T.isEmpty()) {
             return "";
         }
 
@@ -23,10 +23,6 @@ public class MinimumWindowSubsequence  {
          * eg: for the string s = abcdebdde and t = bde, we should traverse s string until we find first e,
          * i.e. abcde, then traverse back from current "e" to find if we have other combination of bde with smaller
          * length.
-         * @param right: fast pointer that always points the last character of T in S
-         * @param left: slow pointer that used to traverse back when right pointer find the last character of T in S
-         * @param tIndex: third pointer used to scan string T
-         * @param minLen: current minimum length of subsequence
          * */
         int right = 0;
         int minLen = Integer.MAX_VALUE;

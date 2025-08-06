@@ -2,9 +2,6 @@ package practiceproblems.stack;
 
 import java.util.*;
 
-// Monotonic Stack: By iterating from right to left,
-// we can maintain a monotonic stack (a stack where elements are in increasing order from top to bottom)
-// https://leetcode.com/problems/next-greater-element-i/
 class NextGreaterElement {
 
     static int arr[] = {1, 3, 4, 2};
@@ -63,10 +60,10 @@ class NextGreaterElement {
         int n = nums.length;
         Deque<Integer> stack = new ArrayDeque<>();
         for (int i = 0; i < nums.length; i++) {
-            while (!stack.isEmpty() && nums[stack.peek()%n] > nums[i%n]) {
+            while (!stack.isEmpty() && nums[stack.peek() % n] > nums[i % n]) {
                 stack.pop();
             }
-            res[i%n] = stack.isEmpty() ? -1 : nums[stack.peek() % n];
+            res[i % n] = stack.isEmpty() ? -1 : nums[stack.peek() % n];
             stack.push(i);
         }
         return res;
@@ -77,27 +74,50 @@ class NextGreaterElement {
 
     }
 
-    //     Input: nums1 = [4,1,2], nums2 = [1,3,4,2].
-    //     Output: [-1,3,-1]
-    // Explanation:
-    //     For number 4 in the first array, you cannot find the next greater number for it in the second array, so output -1.
-    //     For number 1 in the first array, the next greater number for it in the second array is 3.
-    //     For number 2 in the first array, there is no next greater number for it in the second array, so output -1.
-    public int[] nextGreaterElement(int[] findNums, int[] nums) {
-        int[] ret = new int[findNums.length];
-        Arrays.fill(ret,-1);
-        ArrayDeque<Integer> stack = new ArrayDeque<>();
-        for (int i = nums.length - 1; i >= 0; i--) {
-            // Remove elements from the stack that are less than
-            // or equal to the current element
-            while (!stack.isEmpty() && stack.peek() <= nums[i]) {
+    public static int[] count_NGEs(int N, int arr[], int queries, int indices[]) {
+        int[] result = new int[N];
+        Deque<Integer> stack = new ArrayDeque<>();
+        for (int i = N - 1; i >= 0; i--) {
+            while (!stack.isEmpty() && arr[stack.peek()] <= arr[i]) {
                 stack.pop();
             }
-
-            ret[i] = stack.isEmpty()?-1:stack.peek();
-            stack.push(nums[i]);
+            result[i] = stack.size();
+            stack.push(i);
         }
-        return ret;
+        int[] ans = new int[queries];
+        for (int i = 0; i < queries; i++) {
+            ans[i] = result[indices[i]];
+        }
+        return ans;
+    }
+
+    // https://leetcode.com/problems/next-greater-element-i/
+    // We process nums2 from end to beginning because the "next greater element" for any number is to its right
+    // By starting from the end, we maintain information about elements we've already seen
+    public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+        Deque<Integer> arrayDeque = new ArrayDeque<>();
+        int[] result = new int[nums1.length];
+        Map<Integer, Integer> cache = new HashMap<>();
+        for (int i = nums2.length - 1; i >= 0; i--) {
+            while (!arrayDeque.isEmpty() && arrayDeque.peek() <= nums2[i]) {
+                arrayDeque.pop();
+            }
+            if (arrayDeque.isEmpty()) {
+                cache.put(nums2[i], -1);
+            } else {
+                cache.put(nums2[i], arrayDeque.peek());
+            }
+            arrayDeque.push(nums2[i]);
+        }
+
+        //The solution works because:
+        //All elements of nums1 are guaranteed to be in nums2 (problem constraint)
+        //We've precomputed next greater elements for EVERY element in nums2
+        for (int i = 0; i < nums1.length; i++) {
+            result[i] = cache.get(nums1[i]);
+        }
+
+        return result;
     }
 
     public int[] nextGreaterElementBruteForce(int[] nums1, int[] nums2) {
@@ -139,22 +159,5 @@ class NextGreaterElement {
             }
         }
         return res;
-    }
-
-    public static int[] count_NGEs(int N, int arr[], int queries, int indices[]) {
-        int[] result = new int[N];
-        Deque<Integer> stack = new ArrayDeque<>();
-        for(int i= N-1; i>=0 ; i--){
-            while(!stack.isEmpty() && arr[stack.peek()] <= arr[i]){
-                stack.pop();
-            }
-            result[i] = stack.size();
-            stack.push(i);
-        }
-        int[] ans = new int[queries];
-        for(int i=0;i<queries;i++){
-            ans[i] = result[indices[i]];
-        }
-        return ans;
     }
 }
