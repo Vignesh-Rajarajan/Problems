@@ -1,5 +1,8 @@
 package graph.leetcode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Input: [[1,2], [1,3], [2,3]]
  * Output: [2,3]
@@ -26,6 +29,56 @@ public class RedundantConnection {
             }
         }
         return new int[]{-1, -1};
+    }
+
+    // Performs DFS and returns true if there's a path between src and target.
+    private boolean isConnected(
+            int src,
+            int target,
+            boolean[] visited,
+            List<Integer>[] adjList
+    ) {
+        visited[src] = true;
+
+        if (src == target) {
+            return true;
+        }
+
+        boolean isFound = false;
+        for (int adj : adjList[src]) {
+            if (!visited[adj]) {
+                isFound = isFound || isConnected(adj, target, visited, adjList);
+            }
+        }
+
+        return isFound;
+    }
+
+    //The key idea is that we can safely discard an edge if it connects two nodes
+    // that are already part of the same connected component.
+    // In simple terms, this means that if there's already a path between
+    // the two nodes (even without the current edge), adding this edge would create a cycle, making it redundant.
+    public int[] findRedundantConnectionDFS(int[][] edges) {
+        int N = edges.length;
+
+        List<Integer>[] adjList = new ArrayList[N];
+        for (int i = 0; i < N; i++) {
+            adjList[i] = new ArrayList<>();
+        }
+
+        for (int[] edge : edges) {
+            boolean[] visited = new boolean[N];
+
+            // If DFS returns true, we will return the edge.
+            if (isConnected(edge[0] - 1, edge[1] - 1, visited, adjList)) {
+                return new int[]{edge[0], edge[1]};
+            }
+
+            adjList[edge[0] - 1].add(edge[1] - 1);
+            adjList[edge[1] - 1].add(edge[0] - 1);
+        }
+
+        return new int[]{};
     }
 
     static class UnionFind {
@@ -60,6 +113,7 @@ public class RedundantConnection {
             return true;
         }
     }
+
 }
 
 

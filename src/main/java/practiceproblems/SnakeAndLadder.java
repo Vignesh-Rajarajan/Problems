@@ -1,34 +1,49 @@
 package practiceproblems;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.HashSet;
 import java.util.Queue;
+import java.util.Set;
 
 /**
- * tricky bfs, consider as 1-D plane
+ * tricky bfs
  * https://leetcode.com/problems/snakes-and-ladders/
  */
 public class SnakeAndLadder {
 
     public int snakesAndLadders(int[][] board) {
         int n = board.length;
-        Queue<Integer> queue = new LinkedList<>();
-        queue.offer(1);
-        boolean[] visited = new boolean[n * n + 1];
-        for (int move = 0; !queue.isEmpty(); move++) {
+        Queue<int[]> queue = new ArrayDeque<>();
+        queue.offer(new int[]{1, 0});
+        Set<Integer> visit = new HashSet<>();
 
-            for (int size = queue.size(); size > 0; size--) {
-                int currPos = queue.poll();
-                if (visited[currPos]) continue;
-                visited[currPos] = true;
-                if (currPos == n * n) return move;
-                for (int i = 1; i <= 6 && currPos + i <= n * n; i++) {
-                    int next = currPos + i;
-                    int value = getBoardValue(board, next);
-                    if (value > 0) next = value;
-                    if (!visited[next]) queue.offer(next);
+        while (!queue.isEmpty()) {
+            int[] tmp = queue.poll();
+            int pos = tmp[0];
+            int moves = tmp[1];
+            for (int i = 1; i <= 6; i++) {
+                int nextPos = pos + i;
+                int[] boardPos = toBoardPos(nextPos, n);
+                int row = boardPos[0];
+                int col = boardPos[1];
+                if (board[row][col] != -1) {
+                    nextPos = board[row][col];
                 }
+
+                if (nextPos == n * n) {
+                    return moves + 1;
+                }
+
+                if (visit.contains(nextPos)) {
+                    continue;
+                }
+
+                visit.add(nextPos);
+                queue.offer(new int[]{nextPos, moves + 1});
+
             }
         }
+
         return -1;
     }
 
@@ -49,22 +64,14 @@ public class SnakeAndLadder {
      * <p>
      * if(x%2==1) col =n-1-oldCol;
      */
-    private int getBoardValue(int[][] board, int nextPos) {
-        int n = board.length;
-        int oldRow = (nextPos - 1) / n;
-        int row = n - 1 - oldRow;
-        int oldCol = (nextPos - 1) % n;
-        int col = oldRow % 2 == 0 ? oldCol : n - 1 - oldCol;
+    public int[] toBoardPos(int nextPos, int n) {
+        int row = (nextPos - 1) / n;
+        int col = (nextPos - 1) % n;
+        if (row % 2 == 1) {
+            col = n - 1 - col;
+        }
+        row = n - 1 - row;
 
-        return board[row][col];
-    }
-
-    public static void main(String[] args) {
-
-        int[][] board = {{-1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1},
-                {-1, 35, -1, -1, 13, -1}, {-1, -1, -1, -1, -1, -1}, {-1, 15, -1, -1, -1, -1}};
-
-        System.out.println("Min Dice throws required is " + new SnakeAndLadder().snakesAndLadders(board));
-
+        return new int[]{row, col};
     }
 }

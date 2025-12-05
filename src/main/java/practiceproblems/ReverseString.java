@@ -27,7 +27,7 @@ public class ReverseString {
         // Step 2: Reverse the entire string (your original code)
         reverse(str, 0, str.length - 1);
 
-        int start = 0, end = 0;
+        int start, end = 0;
         int n = str.length;
         int resultPos = 0;
 

@@ -8,14 +8,6 @@ import java.util.*;
  * https://youtu.be/FMwpt_aQOGw
  * https://leetcode.com/problems/accounts-merge/
  * <p>
- * Here, we use disjoint set union data structure to keep track of same user accounts.
- * We use a hash map to map emails to account's indices (index of the account in accounts list).
- * Note that different accounts (equivalently account ids) may belong to the same user.
- * We perform union operation on account ids. This might reduce the number of union operations, compared to when we perform union on all emails.
- * We start by iterating all email ids linked to all the accounts.
- * If we observe that an email has been observed before, we know that both email ids must belong to different accounts which belong to the same user.
- * Thus, we fetch the account ids corresponding to this email id, one is the current account's index, and the other is the account index from the map.
- * We then perform union on the account indices.
  */
 public class AccountsMerge {
     public List<List<String>> accountsMerge(List<List<String>> accounts) {
@@ -25,11 +17,11 @@ public class AccountsMerge {
 
         for (int i = 0; i < accounts.size(); i++) {
             List<String> emails = accounts.get(i);
-            // Step 1: traverse all emails except names, if we have not seen an email before, put it with its index into map.
-            // Otherwise, union the email to its parent index.
             // we are starting j=1 because j=0 will contain the name not the email
             for (int j = 1; j < emails.size(); j++) {
                 String email = emails.get(j);
+                // we have already seen the email, so we need to merge the last
+                // seen value with i
                 if (emailsToIdMapper.containsKey(email)) {
                     uf.union(emailsToIdMapper.get(email), i);
                 } else {
@@ -42,10 +34,19 @@ public class AccountsMerge {
 
         for (String email : emailsToIdMapper.keySet()) {
             int id = emailsToIdMapper.get(email);
+            // Find the root parent for the set this email belongs to. This parentId
+            // represents the merged account.
             int parentId = uf.find(id);
+
+            // If we haven't seen this parentId before, it means this is the first email
+            // for this merged account. We need to initialize its list and add the name.
+            // The name is retrieved from the account list corresponding to the parentId.
             if (!result.containsKey(parentId)) {
                 result.computeIfAbsent(parentId, x -> new ArrayList<>()).add(accounts.get(parentId).get(0));
             }
+            // Add the current email to the list of the merged account.
+            // Since emailsToIdMapper is a TreeMap, emails are iterated in sorted order,
+            // so they will be added to the result list in sorted order.
             result.get(parentId).add(email);
         }
 

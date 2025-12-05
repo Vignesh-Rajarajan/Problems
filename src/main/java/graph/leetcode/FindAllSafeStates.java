@@ -26,6 +26,12 @@ public class FindAllSafeStates {
         return safeNodes;
     }
 
+    //DFS starts at 0:
+    //  0: Visiting
+    //     → go to 1: Visiting
+    //         → go to 2: Visiting
+    //             → go to 0: already Visiting → CYCLE → return false
+
     private boolean isSafe(int[][] graph, int node, State[] states) {
         if (states[node] != null) {
             return states[node] == State.VISITED;
@@ -41,8 +47,14 @@ public class FindAllSafeStates {
         return true;
     }
 
+    //The "trick" here is using three states for each node:
+    // enum States {
+    //    Visiting,  // currently in the recursion stack (DFS in progress)
+    //    Visited,   // completely processed, not part of a cycle
+    //    null       // unvisited
+    //}
     enum State {
         VISITED,
-        VISITING
+        VISITING,
     }
 }
