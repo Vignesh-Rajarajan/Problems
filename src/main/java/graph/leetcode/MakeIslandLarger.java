@@ -48,35 +48,9 @@ public class MakeIslandLarger {
     }
 
     /**
-     * https://www.youtube.com/watch?v=_426VVOB8Vo&ab_channel=MichaelMuinos
+     * https://youtu.be/pq61VNqXGvA
      * time is O(M*N)
-     * <p>
-     * For each 1 in the grid, we paint all connected 1 with the next available color (2, 3, and so on).
-     * We also remember the size of the island we just painted with that color.
-     * <p>
-     * Then, we analyze all 0 in the grid,
-     * and sum sizes of connected islands (based on the island color).
-     * Note that the same island can connect to 0 more than once.
-     * The example below demonstrates this idea (the answer is highlighted):
-     * input:
-     * 0 1 0 1 0
-     * 1 1 0 0 1
-     * 0 0 1 1 0
-     * <p>
-     * transformed group: 2 is one group of island, 3 is one group, 4 is one group and 5 is another
-     * the length of each group is stored in map
-     * 0 2 0 3 0
-     * 2 2 0 0 4
-     * 0 0 5 5 0
-     * <p>
-     * we iterate the matrix back, whenever we find 0, we see all the neighbours group value
-     * for example at index grid[0][2] we have 2 and 3 as neighbours, we add both of the group's length
-     * to sum and add 1 to it because we are considering grid[0][2] is changed to land now
-     * sum = 1+ 3(2's length) + 1 (3's length) => 5
-     *
-     * @param grid
-     * @return
-     */
+    */
 
     public int largestIsland(int[][] grid) {
         Map<Integer, Integer> map = new HashMap<>(); //Key: color, Val: size of island painted of that color

@@ -2,7 +2,9 @@ package graph.leetcode;
 
 import graph.disjoints.DisjointSetByRank;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 /**
  * https://leetcode.com/problems/path-with-minimum-effort/
@@ -15,75 +17,55 @@ public class MinPathHavingMaxDifference {
     private static final int[][] directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
 
     public int minimumEffortPath(int[][] heights) {
-
-        int m = heights.length;
-        int n = heights[0].length;
-
-        int[][] dist = new int[m][n];
-
-        for (int[] d : dist) {
-            Arrays.fill(d, Integer.MAX_VALUE);
+        int rows = heights.length;
+        int cols = heights[0].length;
+        int[][] dist = new int[rows][cols];
+        for (int[] row : dist) {
+            Arrays.fill(row, Integer.MAX_VALUE);
         }
-
-        PriorityQueue<int[]> queue = new PriorityQueue<>(Comparator.comparingInt(a -> a[2]));
-
-        queue.offer(new int[]{0, 0, 0});
         dist[0][0] = 0;
-        Set<String> set = new HashSet<>();
-        int[][] dirs = new int[][]{{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-        int result = 0;
+        PriorityQueue<int[]> queue = new PriorityQueue<>((a, b) -> a[2] - b[2]);
+        queue.offer(new int[]{0, 0, 0});
+        int[][] directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
         while (!queue.isEmpty()) {
-
             int[] node = queue.poll();
+            int row = node[0];
+            int col = node[1];
+            int cost = node[2];
 
-            int x = node[0];
-            int y = node[1];
-            int distance = node[2];
-
-            if (distance > dist[x][y]) continue;
-
-            result = Math.max(result, distance);
-            if (x == m - 1 && y == n - 1) return result;
-
-            if (!set.add(x + "-" + y)) continue;
-            for (int[] dir : dirs) {
-
-                int newX = x + dir[0];
-                int newY = y + dir[1];
-
-                if (newX < 0 || newY < 0 || newX >= m || newY >= n) continue;
-
-                int diff = Math.abs(heights[x][y] - heights[newX][newY]);
-                dist[newX][newY] = diff;
-                queue.offer(new int[]{newX, newY, diff});
+            if (row == rows - 1 && col == cols - 1) return cost;
+            if (dist[row][col] < cost) continue;
+            for (int[] dir : directions) {
+                int newR = row + dir[0];
+                int newC = col + dir[1];
+                if (newR < 0 || newC < 0 || newR >= rows || newC >= cols) {
+                    continue;
+                }
+                int newCost = Math.max(cost, Math.abs(heights[row][col] - heights[newR][newC]));
+                if (newCost < dist[newR][newC]) {
+                    dist[newR][newC] = newCost;
+                    queue.offer(new int[]{newR, newC, newCost});
+                }
             }
+
         }
 
-        return -1;
+        return 0;
+
     }
 
-    // This works because at each step, we're always
-    // choosing the option that keeps our highest point as low as possible
-    //     0 1 2
-    //     3 5 6
-    //     4 8 7
-    // Start at (0,0), value 0. Add to PQ: [(0,0,0)]
-    //Explore neighbors of (0,0):
-    //Right (0,1): value 1. Add to PQ: [(0,1,1), (0,0,0)]
-    //Down (1,0): value 3. Add to PQ: [(0,1,1), (1,0,3), (0,0,0)]
-    //Process (0,1) as it has the lowest max (1):
-    //Explore (0,2): value 2. Add to PQ: [(0,2,2), (1,0,3), (0,0,0)]
-    //Explore (1,1): value 5. Add to PQ: [(0,2,2), (1,0,3), (1,1,5), (0,0,0)]
-    //Process (0,2) as it has the lowest max (2):
-    //Explore (1,2): value 6. Add to PQ: [(1,0,3), (1,1,5), (1,2,6), (0,0,0)]
-    //Process (1,0) as it has the next lowest max (3):
-    //Explore (2,0): value 4. Add to PQ: [(2,0,4), (1,1,5), (1,2,6), (0,0,0)]
-    //Process (2,0) as it has the next lowest max (4):
-    //Explore (2,1): value 8. Add to PQ: [(1,1,5), (1,2,6), (2,1,8), (0,0,0)]
-    //Process (1,1) as it has the next lowest max (5):
-    //No new unexplored neighbors.
-    //Process (1,2) as it has the next lowest max (6):
-    //Explore (2,2): value 7. We've reached the target!
+    //1. The "Waiting Room" Analogy
+    //Imagine the Priority Queue (PQ) is a waiting room for different potential paths.
+    //Path A has encountered a maximum height of 10 so far.
+    //Path B has encountered a maximum height of 50 so far.
+    //Both are in the PQ. The algorithm asks the PQ:
+    // "Give me the easiest path available right now." The PQ gives you Path A. You take one step from Path A.
+    //If Path A's neighbor is huge (say, 100), Path A goes back into the waiting room with a cost of 100.
+    //Now, when you ask the PQ for the next path, it will switch to Path B (because 50 is better than 100).
+    //Why this guarantees the solution: The code explores the grid in order of "effort."
+    //It refuses to take a step on a "hard" path (high elevation) until it has exhausted all "easier" paths (low elevation).
+    //Therefore, the very first time you touch the destination (n-1, n-1),
+    //it is mathematically guaranteed that you arrived there via the path with the lowest possible maximum height.
     public int swimInWater(int[][] grid) {
         int n = grid.length;
         PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[2]));

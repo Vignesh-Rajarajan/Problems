@@ -48,7 +48,11 @@ public class CheapestFlightKStops {
 
             if (current == dst) return cost;
 
-
+            //Imagine you have a special "Transit Visa" that only allows you to board a plane k times.
+            //You have just landed at an airport.
+            //You check your visa stamp. It says you have used k out of k allowed flights.
+            //Even if there is a flight to your destination leaving right now for 1, you cannot board it.
+            // You have used up your travel allowance.
             if (stop == k) continue; // if enqueued enough stops, skip
 
             for (int[] adj : adjList.getOrDefault(current, new ArrayList<>())) {
@@ -56,7 +60,21 @@ public class CheapestFlightKStops {
                 int next = adj[0];
                 int costNext = adj[1];
 
-                // Add for better cost, or stop
+                //3. if (cost + costNext < costs[next] || hops + 1 < stops[next])
+                //The Analogy: The "Bargain Hunter" vs. The "Strategic Traveler"
+                //This is the most critical part. Standard Dijkstra only cares about the cheapest price.
+                //This condition cares about two different types of "value."
+                //Part A: cost + costNext < costs[next] (The Bargain Hunter)
+                //"I found a way to get to Paris for $200. The previous best was $300. This is a clear win. Update the records!"
+                //Part B: hops + 1 < stops[next] (The Strategic Traveler)
+                //This is the tricky one. Why would you accept a path that is more expensive?
+                //Scenario:
+                //Path A (Existing Best): Costs $100, but uses 3 flights. (Cheap, but exhausted your allowance).
+                //Path B (Current): Costs $150, but uses only 1 flight.
+                //The Logic: Even though Path B is more expensive ($150), it is "fresher." It has only used 1 flight.
+                //Why it matters: Maybe to reach the final destination, you need 2 more flights.
+                //Path A (3 flights used) might hit the k limit and fail. Path B (1 flight used),
+                // despite being pricier, has enough "fuel" left to finish the journey.
                 if (cost + costNext < costs[next] || stop + 1 < stops[next]) {
                     queue.offer(new int[]{next, cost + costNext, stop + 1});
                     costs[next] = cost + costNext;

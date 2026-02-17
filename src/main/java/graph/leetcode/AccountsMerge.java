@@ -5,8 +5,8 @@ import java.util.*;
 /**
  * tricky union find
  * <p>
- * https://youtu.be/FMwpt_aQOGw
- * https://leetcode.com/problems/accounts-merge/
+ * <a href="https://youtu.be/FMwpt_aQOGw">...</a>
+ * <a href="https://leetcode.com/problems/accounts-merge/">...</a>
  * <p>
  */
 public class AccountsMerge {

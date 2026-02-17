@@ -16,25 +16,19 @@ public class NetworkDelayTime {
         int[] signalReceivedAt = new int[N + 1];
         Arrays.fill(signalReceivedAt, Integer.MAX_VALUE);
         //distance, node into pq
-        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[1]));
+        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
 
         pq.add(new int[]{0, K});
 
         signalReceivedAt[K] = 0;
-        Set<Integer> visited = new HashSet<>();
         while (!pq.isEmpty()) {
             int[] cur = pq.remove();
 
             int currNode = cur[1];
             int currNodeTime = cur[0];
-
-            if (visited.contains(currNode)) {
-                continue;
-            }
             if (currNodeTime > signalReceivedAt[currNode]) {
                 continue;
             }
-            visited.add(currNode);
             for (int[] next : adj.getOrDefault(currNode, new ArrayList<>())) {
                 int neighborNode = next[0];
                 int time = next[1];
